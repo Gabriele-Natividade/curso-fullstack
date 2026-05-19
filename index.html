@@ -3,181 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de IMC</title>
+    <title>Calculadora de Gorjeta</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
         body {
-            background-color: #f4f7f6;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
+            font-family: sans-serif;
+            background-color: #f0f2f5;
+            padding: 40px;
+            text-align: center;
         }
 
         .container {
-            background-color: #ffffff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 400px;
-        }
-
-        h2 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 20px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 300px;
+            margin: 0 auto;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
         .input-group {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+            text-align: left;
         }
 
         label {
             display: block;
-            margin-bottom: 8px;
-            color: #555;
-            font-weight: 600;
+            margin-bottom: 5px;
         }
 
-        input[type="number"] {
+        input, select {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
-
-        input[type="number"]:focus {
-            outline: none;
-            border-color: #4caf50;
+            padding: 8px;
+            box-sizing: border-box;
         }
 
         button {
             width: 100%;
-            background-color: #4caf50;
+            padding: 10px;
+            background-color: #28a745;
             color: white;
-            padding: 14px;
             border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
+            border-radius: 4px;
             cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        button:hover {
-            background-color: #45a049;
         }
 
         #resultado {
-            margin-top: 25px;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
+            margin-top: 20px;
             font-weight: bold;
-            display: none; /* Escondido até o cálculo */
         }
-
-        /* Cores dinâmicas para o resultado */
-        .normal { background-color: #e8f5e9; color: #2e7d32; }
-        .alerta { background-color: #fff3e0; color: #ef6c00; }
-        .perigo { background-color: #ffebee; color: #c62828; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h2>Calculadora de IMC</h2>
+        <h2>Dividir Conta</h2>
         
-        <!-- Removido a action padrão do form para tratar com JS -->
-        <form id="imcForm">
+        <form id="gorjetaForm">
             <div class="input-group">
-                <label for="peso">Peso (kg):</label>
-                <input 
-                    type="number" 
-                    id="peso" 
-                    placeholder="Exemplo: 65" 
-                    step="0.1" 
-                    required
-                > 
+                <label for="totalConta">Total da Conta (R$):</label>
+                <input type="number" id="totalConta" step="0.01" required> 
             </div>
             
             <div class="input-group">
-                <label for="altura">Altura (m):</label>
-                <input 
-                    type="number" 
-                    id="altura" 
-                    placeholder="Exemplo: 1.70" 
-                    step="0.01" 
-                    required
-                > 
+                <label for="qualidadeServico">Qualidade do Serviço:</label>
+                <select id="qualidadeServico" required>
+                    <option value="0.10">Excelente (10%)</option>
+                    <option value="0.15">Excepcional (15%)</option>
+                    <option value="0.05">Regular (5%)</option>
+                </select>
             </div>
 
-            <button type="submit">Calcular IMC</button>
+            <div class="input-group">
+                <label for="numPessoas">Número de Pessoas:</label>
+                <input type="number" id="numPessoas" min="1" value="1" required> 
+            </div>
+
+            <button type="submit">Calcular Total</button>
         </form>
 
         <div id="resultado"></div>
     </div>
 
     <script>
-        document.getElementById('imcForm').addEventListener('submit', function(event) {
-            // Evita que a página recarregue ao submeter o formulário
+        document.getElementById('gorjetaForm').addEventListener('submit', function(event) {
             event.preventDefault(); 
 
-            // Captura os valores e converte para float
-            const peso = parseFloat(document.getElementById('peso').value);
-            const altura = parseFloat(document.getElementById('altura').value);
+            const totalConta = parseFloat(document.getElementById('totalConta').value);
+            const taxaGorjeta = parseFloat(document.getElementById('qualidadeServico').value);
+            const numPessoas = parseInt(document.getElementById('numPessoas').value);
             const resultadoDiv = document.getElementById('resultado');
 
-            // Validação simples de segurança
-            if (!peso || !altura || altura <= 0) {
-                resultadoDiv.style.display = 'block';
-                resultadoDiv.className = 'perigo';
-                resultadoDiv.innerHTML = 'Por favor, insira valores válidos.';
-                return;
-            }
+            const valorGorjeta = totalConta * taxaGorjeta;
+            const valorTotal = totalConta + valorGorjeta;
+            const valorPorPessoa = (valorTotal / numPessoas).toFixed(2);
 
-            // Cálculo do IMC
-            const imc = (peso / (altura * altura)).toFixed(1);
-            let classificacao = '';
-            let classeCss = '';
-
-            // Tabela de classificação do IMC
-            if (imc < 18.5) {
-                classificacao = 'Abaixo do peso';
-                classeCss = 'alerta';
-            } else if (imc >= 18.5 && imc <= 24.9) {
-                classificacao = 'Peso normal';
-                classeCss = 'normal';
-            } else if (imc >= 25 && imc <= 29.9) {
-                classificacao = 'Sobrepeso';
-                classeCss = 'alerta';
-            } else if (imc >= 30 && imc <= 34.9) {
-                classificacao = 'Obesidade Grau I';
-                classeCss = 'perigo';
-            } else if (imc >= 35 && imc <= 39.9) {
-                classificacao = 'Obesidade Grau II';
-                classeCss = 'perigo';
-            } else {
-                classificacao = 'Obesidade Grau III';
-                classeCss = 'perigo';
-            }
-
-            //funcionando perfeitamente
-            //PROXIMA ETAPA APROVADA
-            // Exibe o resultado na tela mudando a classe CSS dinamicamente
-            resultadoDiv.style.display = 'block';
-            resultadoDiv.className = classeCss;
-            resultadoDiv.innerHTML = `Seu IMC é ${imc} (${classificacao})`;
+            resultadoDiv.innerHTML = `Gorjeta: R$ ${valorGorjeta.toFixed(2)}<br>Total por Pessoa: R$ ${valorPorPessoa}`;
         });
     </script>
 
