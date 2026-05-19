@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Gorjeta</title>
+    <title>Conversor de Moeda Simples</title>
     <style>
         body {
             font-family: sans-serif;
-            background-color: #f0f2f5;
+            background-color: #f4f4f9;
             padding: 40px;
             text-align: center;
         }
@@ -16,9 +16,9 @@
             background-color: white;
             padding: 20px;
             border-radius: 8px;
-            max-width: 300px;
+            max-width: 280px;
             margin: 0 auto;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
         }
 
         .input-group {
@@ -31,7 +31,7 @@
             margin-bottom: 5px;
         }
 
-        input, select {
+        input {
             width: 100%;
             padding: 8px;
             box-sizing: border-box;
@@ -40,7 +40,7 @@
         button {
             width: 100%;
             padding: 10px;
-            background-color: #28a745;
+            background-color: #007bff;
             color: white;
             border: none;
             border-radius: 4px;
@@ -50,54 +50,44 @@
         #resultado {
             margin-top: 20px;
             font-weight: bold;
+            font-size: 1.1em;
+            color: #333;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h2>Dividir Conta</h2>
+        <h2>USD para BRL</h2>
         
-        <form id="gorjetaForm">
+        <form id="conversorForm">
             <div class="input-group">
-                <label for="totalConta">Total da Conta (R$):</label>
-                <input type="number" id="totalConta" step="0.01" required> 
+                <label for="valorDolar">Valor em Dólar (US$):</label>
+                <input type="number" id="valorDolar" step="0.01" min="0" placeholder="0,00" required> 
             </div>
             
             <div class="input-group">
-                <label for="qualidadeServico">Qualidade do Serviço:</label>
-                <select id="qualidadeServico" required>
-                    <option value="0.10">Excelente (10%)</option>
-                    <option value="0.15">Excepcional (15%)</option>
-                    <option value="0.05">Regular (5%)</option>
-                </select>
+                <label for="taxaCambio">Taxa de Câmbio (R$):</label>
+                <input type="number" id="taxaCambio" step="0.01" min="0" value="5.00" required> 
             </div>
 
-            <div class="input-group">
-                <label for="numPessoas">Número de Pessoas:</label>
-                <input type="number" id="numPessoas" min="1" value="1" required> 
-            </div>
-
-            <button type="submit">Calcular Total</button>
+            <button type="submit">Converter</button>
         </form>
 
         <div id="resultado"></div>
     </div>
 
     <script>
-        document.getElementById('gorjetaForm').addEventListener('submit', function(event) {
+        document.getElementById('conversorForm').addEventListener('submit', function(event) {
             event.preventDefault(); 
 
-            const totalConta = parseFloat(document.getElementById('totalConta').value);
-            const taxaGorjeta = parseFloat(document.getElementById('qualidadeServico').value);
-            const numPessoas = parseInt(document.getElementById('numPessoas').value);
+            const valorDolar = parseFloat(document.getElementById('valorDolar').value);
+            const taxaCambio = parseFloat(document.getElementById('taxaCambio').value);
             const resultadoDiv = document.getElementById('resultado');
 
-            const valorGorjeta = totalConta * taxaGorjeta;
-            const valorTotal = totalConta + valorGorjeta;
-            const valorPorPessoa = (valorTotal / numPessoas).toFixed(2);
+            const valorReal = (valorDolar * taxaCambio).toFixed(2);
 
-            resultadoDiv.innerHTML = `Gorjeta: R$ ${valorGorjeta.toFixed(2)}<br>Total por Pessoa: R$ ${valorPorPessoa}`;
+            resultadoDiv.innerHTML = `Total: R$ ${valorReal}`;
         });
     </script>
 
