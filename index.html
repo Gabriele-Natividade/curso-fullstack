@@ -5,88 +5,66 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contador Moderno Pro</title>
     <style>
+        :root {
+            --color-pos: #2ecc71; --color-pos-h: #27ae60;
+            --color-neg: #e74c3c; --color-neg-h: #c0392b;
+            --color-neu: #7f8c8d; --color-neu-h: #95a5a6;
+            --color-zero: #2c3e50;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            margin: 0; 
-            background: linear-gradient(135deg, #e0eafc, #cfdef3); 
-        }>
-        .card { 
-            text-align: center; 
-            padding: 30px 40px; 
-            background: white; 
-            border-radius: 16px; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
-            min-width: 250px;
+            display: flex; justify-content: center; align-items: center; 
+            height: 100vh; background: linear-gradient(135deg, #e0eafc, #cfdef3); 
         }
-        h1 {
-            font-size: 1.2rem;
-            color: #666;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        #display { 
-            font-size: 4rem; 
-            margin: 10px 0 25px 0; 
-            font-weight: bold;
-            transition: color 0.3s ease;
-        }
-        .positivo { color: #2ecc71; }
-        .negativo { color: #e74c3c; }
-        .zero { color: #2c3e50; }
-        .button-group {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-        }
-        button { 
-            padding: 12px 18px; 
-            font-size: 16px; 
-            font-weight: 600;
-            cursor: pointer; 
-            border: none; 
-            color: white; 
-            border-radius: 8px; 
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        }
+        .card { text-align: center; padding: 2rem 2.5rem; background: #fff; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); min-width: 280px; }
+        h1 { font-size: 1.1rem; color: #666; margin-bottom: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+        .display { display: block; font-size: 4.5rem; margin: 0.5rem 0 1.5rem 0; font-weight: bold; transition: color 0.3s ease; }
+        .positivo { color: var(--color-pos); }
+        .negativo { color: var(--color-neg); }
+        .zero { color: var(--color-zero); }
+        .button-group { display: flex; gap: 12px; justify-content: center; }
+        button { padding: 12px 20px; font-size: 1rem; font-weight: 600; cursor: pointer; border: none; color: #fff; border-radius: 8px; transition: transform 0.1s, background-color 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         button:active { transform: scale(0.95); }
-        .btn-add { background: #2ecc71; }
-        .btn-add:hover { background: #27ae60; }
-        .btn-sub { background: #e74c3c; }
-        .btn-sub:hover { background: #c0392b; }
-        .btn-reset { background: #7f8c8d; }
-        .btn-reset:hover { background: #95a5a6; }
+        button:focus-visible { outline: 3px solid #3498db; outline-offset: 2px; }
+        .btn-sub { background: var(--color-neg); }
+        .btn-sub:hover { background: var(--color-neg-h); }
+        .btn-reset { background: var(--color-neu); }
+        .btn-reset:hover { background: var(--color-neu-h); }
+        .btn-add { background: var(--color-pos); }
+        .btn-add:hover { background: var(--color-pos-h); }
     </style>
 </head>
 <body>
 
-    <div class="card">
+    <main class="card">
         <h1>Contador</h1>
-        <div id="display" class="zero">0</div>
+        <output id="display" class="display zero">0</output>
         <div class="button-group">
-            <button class="btn-sub" onclick="update(-1)">- Diminuir</button>
-            <button class="btn-reset" onclick="update(0, true)">Zerar</button>
-            <button class="btn-add" onclick="update(1)">+ Somar</button>
+            <button id="btn-sub" class="btn-sub" aria-label="Diminuir valor">- Diminuir</button>
+            <button id="btn-reset" class="btn-reset" aria-label="Zerar contador">Zerar</button>
+            <button id="btn-add" class="btn-add" aria-label="Somar valor">+ Somar</button>
         </div>
-    </div>
+    </main>
 
     <script>
-        const display = document.getElementById('display');
-        let count = parseInt(localStorage.getItem('meuContador')) || 0;
+        (function() {
+            const display = document.getElementById('display');
+            let count = parseInt(localStorage.getItem('meuContador'), 10) || 0;
 
-        function update(val, reset = false) {
-            count = reset ? 0 : count + val;
-            localStorage.setItem('meuContador', count);
-            display.innerText = count;
-            display.className = count > 0 ? 'positivo' : count < 0 ? 'negativo' : 'zero';
-        }
+            function updateUI(value) {
+                count = value !== undefined ? value : count;
+                localStorage.setItem('meuContador', count);
+                display.textContent = count;
+                display.className = `display ${count > 0 ? 'positivo' : count < 0 ? 'negativo' : 'zero'}`;
+            }
 
-        update(0);
+            document.getElementById('btn-sub').addEventListener('click', () => updateUI(--count));
+            document.getElementById('btn-add').addEventListener('click', () => updateUI(++count));
+            document.getElementById('btn-reset').addEventListener('click', () => updateUI(0));
+            
+            updateUI();
+        })();
     </script>
 </body>
 </html>
