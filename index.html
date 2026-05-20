@@ -3,93 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conversor de Moeda Simples</title>
+    <title>Contador Simples</title>
     <style>
-        body {
-            font-family: sans-serif;
-            background-color: #f4f4f9;
-            padding: 40px;
-            text-align: center;
-        }
-
-        .container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            max-width: 280px;
-            margin: 0 auto;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-        }
-
-        .input-group {
-            margin-bottom: 15px;
-            text-align: left;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-        }
-
-        input {
-            width: 100%;
-            padding: 8px;
-            box-sizing: border-box;
-        }
-
-        button {
-            width: 100%;
-            padding: 10px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        #resultado {
-            margin-top: 20px;
-            font-weight: bold;
-            font-size: 1.1em;
-            color: #333;
-        }
+        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #f4f4f9; }
+        .card { text-align: center; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; border: none; background: #0070f3; color: white; border-radius: 5px; }
     </style>
 </head>
 <body>
-
-    <div class="container">
-        <h2>USD para BRL</h2>
-        
-        <form id="conversorForm">
-            <div class="input-group">
-                <label for="valorDolar">Valor em Dólar (US$):</label>
-                <input type="number" id="valorDolar" step="0.01" min="0" placeholder="0,00" required> 
-            </div>
-            
-            <div class="input-group">
-                <label for="taxaCambio">Taxa de Câmbio (R$):</label>
-                <input type="number" id="taxaCambio" step="0.01" min="0" value="5.00" required> 
-            </div>
-
-            <button type="submit">Converter</button>
-        </form>
-
-        <div id="resultado"></div>
+    <div class="card">
+        <h2 id="display">0</h2>
+        <button onclick="document.getElementById('display').innerText++">Contar</button>
     </div>
-
-    <script>
-        document.getElementById('conversorForm').addEventListener('submit', function(event) {
-            event.preventDefault(); 
-
-            const valorDolar = parseFloat(document.getElementById('valorDolar').value);
-            const taxaCambio = parseFloat(document.getElementById('taxaCambio').value);
-            const resultadoDiv = document.getElementById('resultado');
-
-            const valorReal = (valorDolar * taxaCambio).toFixed(2);
-
-            resultadoDiv.innerHTML = `Total: R$ ${valorReal}`;
-        });
-    </script>
-
 </body>
 </html>
