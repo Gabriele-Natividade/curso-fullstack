@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contador Simples</title>
+    <title>Sorteador de Dado</title>
     <style>
         * { 
             box-sizing: border-box; 
@@ -17,93 +17,79 @@
             justify-content: center; 
             align-items: center; 
             height: 100vh; 
-            background-color: #e0eafc; 
+            background-color: #f3f4f6; 
+            transition: background 0.3s ease;
         }
         
         .card { 
             text-align: center; 
             padding: 30px; 
             background: white; 
-            border-radius: 10px; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+            border-radius: 12px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+            width: 280px;
         }
         
         h1 { 
-            font-size: 1.5rem; 
-            color: #333; 
+            font-size: 1.4rem; 
+            color: #4b5563; 
             margin-bottom: 20px; 
         }
         
         .display { 
-            font-size: 4rem; 
-            margin-bottom: 20px; 
+            font-size: 4.5rem; 
+            margin-bottom: 25px; 
             font-weight: bold; 
-            color: #2c3e50; 
-        }
-        
-        .button-group { 
-            display: flex; 
-            gap: 10px; 
+            color: #1f2937; 
+            transition: transform 0.2s ease;
         }
         
         button { 
-            padding: 10px 20px; 
+            width: 100%;
+            padding: 12px; 
             font-size: 1rem; 
+            font-weight: bold;
             cursor: pointer; 
             border: none; 
             color: white; 
-            border-radius: 5px; 
+            border-radius: 6px; 
+            background-color: #3b82f6;
+            transition: background 0.2s;
         }
-        
-        .btn-sub { background-color: #e74c3c; }
-        .btn-reset { background-color: #7f8c8d; }
-        .btn-add { background-color: #2ecc71; }
+
+        button:hover {
+            background-color: #2563eb;
+        }
     </style>
 </head>
 <body>
 
     <div class="card">
-        <h1>Contador</h1>
-        <div id="display" class="display">0</div>
-        
-        <div class="button-group">
-            <button class="btn-sub" onclick="diminuir()">- Diminuir</button>
-            <button class="btn-reset" onclick="zerar()">Zerar</button>
-            <button class="btn-add" onclick="somar()">+ Somar</button>
-        </div>
+        <h1>Sortear Dado (1 a 6)</h1>
+        <div id="display" class="display">?</div>
+        <button onclick="sortear()">Lançar Dado</button>
     </div>
 
     <script>
-        let numero = 0;
-        
         const display = document.getElementById('display');
 
-        function atualizarCor() {
-            if (numero > 0) {
-                display.style.color = '#2ecc71'; // Verde se for positivo
-            } else if (numero < 0) {
-                display.style.color = '#e74c3c'; // Vermelho se for negativo
-            } else {
-                display.style.color = '#2c3e50'; // Cor padrão se for zero
-            }
-        }
-
-        function somar() {
-            numero = numero + 1;
-            display.textContent = numero;
-            atualizarCor(); // <-- Linha adicionada aqui
-        }
-
-        function disminuir() {
-            numero = numero - 1;
-            display.textContent = numero;
-            atualizarCor(); // <-- Linha adicionada aqui
-        }
-
-        function zerar() {
-            numero = 0;
-            display.textContent = numero;
-            atualizarCor(); // <-- Linha adicionada aqui
+        function sortear() {
+            display.style.transform = 'scale(0.8)';
+            
+            setTimeout(() => {
+                const numeroSorteado = Math.floor(Math.random() * 6) + 1;
+                
+                display.textContent = numeroSorteado;
+                display.style.transform = 'scale(1.1)';
+                
+                if (numeroSorteado === 6) {
+                    display.style.color = '#10b981';
+                } else if (numeroSorteado === 1) {
+                    display.style.color = '#ef4444';
+                } else {
+                    display.style.color = '#1f2937';
+                }
+            }, 150);
         }
     </script>
 </body>
