@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sorteador de Dado</title>
+    <title>Sorteador de Dado Moderno</title>
     <style>
         * { 
             box-sizing: border-box; 
@@ -12,82 +12,92 @@
         }
         
         body { 
-            font-family: Arial, sans-serif; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Fonte mais moderna */
             display: flex; 
             justify-content: center; 
             align-items: center; 
             height: 100vh; 
-            background-color: #f3f4f6; 
-            transition: background 0.3s ease;
+            background-color: #f0f2f5; /* Fundo ligeiramente mais suave */
         }
         
         .card { 
             text-align: center; 
-            padding: 30px; 
+            padding: 35px 25px; 
             background: white; 
-            border-radius: 12px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
-            width: 280px;
+            border-radius: 16px; /* Bordas mais arredondadas */
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05); /* Sombra mais suave e elegante */
+            width: 300px;
         }
         
         h1 { 
-            font-size: 1.4rem; 
-            color: #4b5563; 
+            font-size: 1.3rem; 
+            color: #6b7280; /* Texto cinza intermediário */
             margin-bottom: 20px; 
+            letter-spacing: 0.5px;
         }
         
         .display { 
-            font-size: 4.5rem; 
+            font-size: 5rem; /* Um pouco maior para dar destaque */
             margin-bottom: 25px; 
-            font-weight: bold; 
-            color: #1f2937; 
-            transition: transform 0.2s ease;
+            font-weight: 800; 
+            color: #4f46e5; /* Cor inicial roxa/indigo */
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Animação com efeito "bouncy" */
         }
         
         button { 
             width: 100%;
-            padding: 12px; 
+            padding: 14px; 
             font-size: 1rem; 
             font-weight: bold;
             cursor: pointer; 
             border: none; 
             color: white; 
-            border-radius: 6px; 
-            background-color: #3b82f6;
-            transition: background 0.2s;
+            border-radius: 8px; 
+            background-color: #4f46e5; /* Combinando com o tema roxo */
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+            transition: all 0.2s;
         }
 
         button:hover {
-            background-color: #2563eb;
+            background-color: #4338ca;
+            transform: translateY(-1px); /* Sobe de leve no hover */
+        }
+
+        button:active {
+            transform: translateY(1px); /* Efeito de clique real */
+            box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
         }
     </style>
 </head>
 <body>
 
     <div class="card">
-        <h1>Sortear Dado (1 a 6)</h1>
-        <div id="display" class="display">?</div>
-        <button onclick="sortear()">Lançar Dado</button>
+        <h1>Lançar Dado</h1>
+        <div id="display" class="display">⚀</div> 
+        <button onclick="sortear()">Jogar Dado</button>
     </div>
 
     <script>
         const display = document.getElementById('display');
 
         function sortear() {
-            display.style.transform = 'scale(0.8)';
+            // Aplica escala menor e gira -15 graus para preparar a animação
+            display.style.transform = 'scale(0.7) rotate(-15deg)';
             
             setTimeout(() => {
                 const numeroSorteado = Math.floor(Math.random() * 6) + 1;
                 
                 display.textContent = numeroSorteado;
-                display.style.transform = 'scale(1.1)';
+                // Volta ao tamanho normal, cresce um pouquinho e gira 15 graus para o outro lado
+                display.style.transform = 'scale(1.05) rotate(15deg)';
                 
+                // Cores personalizadas baseadas no resultado
                 if (numeroSorteado === 6) {
-                    display.style.color = '#10b981';
+                    display.style.color = '#10b981'; /* Verde para a sorte grande */
                 } else if (numeroSorteado === 1) {
-                    display.style.color = '#ef4444';
+                    display.style.color = '#f43f5e'; /* Rosa/Vermelho para o azar do 1 */
                 } else {
-                    display.style.color = '#1f2937';
+                    display.style.color = '#4f46e5'; /* Roxo padrão para os outros números */
                 }
             }, 150);
         }
