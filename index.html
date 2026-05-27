@@ -12,36 +12,37 @@
         }
         
         body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Fonte mais moderna */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex; 
             justify-content: center; 
             align-items: center; 
             height: 100vh; 
-            background-color: #f0f2f5; /* Fundo ligeiramente mais suave */
+            background-color: #f0f2f5; 
         }
         
         .card { 
             text-align: center; 
             padding: 35px 25px; 
             background: white; 
-            border-radius: 16px; /* Bordas mais arredondadas */
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05); /* Sombra mais suave e elegante */
+            border-radius: 16px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
             width: 300px;
         }
         
         h1 { 
             font-size: 1.3rem; 
-            color: #6b7280; /* Texto cinza intermediário */
+            color: #6b7280; 
             margin-bottom: 20px; 
             letter-spacing: 0.5px;
         }
         
         .display { 
-            font-size: 5rem; /* Um pouco maior para dar destaque */
+            font-size: 6rem; /* Aumentado levemente para destacar os ícones */
             margin-bottom: 25px; 
             font-weight: 800; 
-            color: #4f46e5; /* Cor inicial roxa/indigo */
-            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Animação com efeito "bouncy" */
+            color: #4f46e5; 
+            display: inline-block;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.2s ease;
         }
         
         button { 
@@ -53,19 +54,26 @@
             border: none; 
             color: white; 
             border-radius: 8px; 
-            background-color: #4f46e5; /* Combinando com o tema roxo */
+            background-color: #4f46e5; 
             box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
             transition: all 0.2s;
         }
 
         button:hover {
             background-color: #4338ca;
-            transform: translateY(-1px); /* Sobe de leve no hover */
+            transform: translateY(-1px);
         }
 
         button:active {
-            transform: translateY(1px); /* Efeito de clique real */
+            transform: translateY(1px); 
             box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
+        }
+
+        /* Desabilita o botão temporariamente enquanto o dado rola */
+        button:disabled {
+            background-color: #9ca3af;
+            box-shadow: none;
+            cursor: not-allowed;
         }
     </style>
 </head>
@@ -74,31 +82,69 @@
     <div class="card">
         <h1>Lançar Dado</h1>
         <div id="display" class="display">⚀</div> 
-        <button onclick="sortear()">Jogar Dado</button>
+        <button id="btn-jogar" onclick="sortear()">Jogar Dado</button>
     </div>
 
     <script>
         const display = document.getElementById('display');
+        const btnJogar = document.getElementById('btn-jogar');
+        
+        // Mapeamento dos números para as faces dos dados em caracteres Unicode
+        const facesDado = {
+            1: '⚀',
+            2: '⚁',
+            3: '⚂',
+            4: '⚃',
+            5: '⚄',
+            6: '⚅'
+        };
 
         function sortear() {
-            display.style.transform = 'scale(0.7) rotate(-15deg)';
+            // Desabilita o botão para evitar múltiplos cliques na animação
+            btnJogar.disabled = true;
             
-            setTimeout(() => {
-                const numeroSorteado = Math.floor(Math.random() * 6) + 1;
+            // Efeito inicial de encolher e inclinar
+            display.style.transform = 'scale(0.6) rotate(-45deg)';
+            display.style.color = '#9ca3af'; // Cor neutra durante o giro
+
+            let giros = 0;
+            
+            // Simula o dado girando/mudando de face rapidamente antes de parar
+            const intervaloGiro = setInterval(() => {
+                const faceAleatoria = Math.floor(Math.random() * 6) + 1;
+                display.textContent = facesDado[faceAleatoria];
+                giros++;
                 
-                display.textContent = numeroSorteado;
-                // Volta ao tamanho normal, cresce um pouquinho e gira 15 graus para o outro lado
-                display.style.transform = 'scale(1.05) rotate(15deg)';
-                
-                // Cores personalizadas baseadas no resultado
-                if (numeroSorteado === 6) {
-                    display.style.color = '#10b981'; /* Verde para a sorte grande */
-                } else if (numeroSorteado === 1) {
-                    display.style.color = '#f43f5e'; /* Rosa/Vermelho para o azar do 1 */
-                } else {
-                    display.style.color = '#4f46e5'; /* Roxo padrão para os outros números */
+                if (giros >= 5) {
+                    clearInterval(intervaloGiro);
+                    revelarResultadoFinal();
                 }
-            }, 150);
+            }, 80);
+        }
+
+        function revelarResultadoFinal() {
+            const numeroSorteado = Math.floor(Math.random() * 6) + 1;
+            
+            // Atualiza para o caractere final do dado
+            display.textContent = facesDado[numeroSorteado];
+            
+            // Aplica o efeito bouncy de crescimento e rotação oposta
+            display.style.transform = 'scale(1.1) rotate(15deg)';
+            
+            // Define as cores personalizadas baseadas no resultado
+            if (numeroSorteado === 6) {
+                display.style.color = '#10b981'; // Verde (Sorte)
+            } else if (numeroSorteado === 1) {
+                display.style.color = '#f43f5e'; // Rosa/Vermelho (Azar)
+            } else {
+                display.style.color = '#4f46e5'; // Roxo padrão
+            }
+
+            // Libera o botão após a animação concluir e estabiliza o dado
+            setTimeout(() => {
+                display.style.transform = 'scale(1) rotate(0deg)';
+                btnJogar.disabled = false;
+            }, 250);
         }
     </script>
 </body>
