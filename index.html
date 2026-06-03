@@ -1,151 +1,453 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sorteador de Dado Moderno</title>
-    <style>
-        * { 
-            box-sizing: border-box; 
-            margin: 0; 
-            padding: 0; 
-        }
-        
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            background-color: #f0f2f5; 
-        }
-        
-        .card { 
-            text-align: center; 
-            padding: 35px 25px; 
-            background: white; 
-            border-radius: 16px; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
-            width: 300px;
-        }
-        
-        h1 { 
-            font-size: 1.3rem; 
-            color: #6b7280; 
-            margin-bottom: 20px; 
-            letter-spacing: 0.5px;
-        }
-        
-        .display { 
-            font-size: 6rem; /* Aumentado levemente para destacar os ícones */
-            margin-bottom: 25px; 
-            font-weight: 800; 
-            color: #4f46e5; 
-            display: inline-block;
-            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.2s ease;
-        }
-        
-        button { 
-            width: 100%;
-            padding: 14px; 
-            font-size: 1rem; 
-            font-weight: bold;
-            cursor: pointer; 
-            border: none; 
-            color: white; 
-            border-radius: 8px; 
-            background-color: #4f46e5; 
-            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
-            transition: all 0.2s;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aura | Moda Minimalista</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap');
 
-        button:hover {
-            background-color: #4338ca;
-            transform: translateY(-1px);
-        }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-        button:active {
-            transform: translateY(1px); 
-            box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
-        }
+body {
+    font-family: 'Montserrat', sans-serif;
+    background-color: #fafafa;
+    color: #111;
+    line-height: 1.6;
+}
 
-        /* Desabilita o botão temporariamente enquanto o dado rola */
-        button:disabled {
-            background-color: #9ca3af;
-            box-shadow: none;
-            cursor: not-allowed;
-        }
-    </style>
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2rem 5%;
+    background-color: #fff;
+    border-bottom: 1px solid #eee;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+nav ul {
+    display: flex;
+    list-style: none;
+    gap: 2.5rem;
+}
+
+nav a {
+    text-decoration: none;
+    color: #111;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: color 0.3s ease;
+}
+
+nav a:hover {
+    color: #888;
+}
+
+.hero {
+    height: 80vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background-color: #eae8e3;
+    padding: 0 1rem;
+}
+
+.hero h1 {
+    font-size: 4rem;
+    font-weight: 300;
+    margin-bottom: 1rem;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+}
+
+.hero p {
+    font-size: 1.1rem;
+    margin-bottom: 2.5rem;
+    max-width: 600px;
+    color: #444;
+}
+
+.btn {
+    padding: 1rem 3rem;
+    background-color: #111;
+    color: #fff;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 0.8rem;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn:hover {
+    background-color: #333;
+    transform: translateY(-2px);
+}
+
+.products {
+    padding: 6rem 5%;
+    background-color: #fff;
+}
+
+.section-title {
+    text-align: center;
+    font-size: 1.8rem;
+    font-weight: 400;
+    margin-bottom: 4rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 3rem;
+}
+
+.card {
+    background: #fff;
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-10px);
+}
+
+.card-img {
+    width: 100%;
+    height: 400px;
+    background-color: #f4f4f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+}
+
+.card-img svg {
+    width: 50px;
+    height: 50px;
+    fill: #ccc;
+}
+
+.card-info {
+    text-align: center;
+}
+
+.card-info h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.card-info p {
+    font-size: 0.95rem;
+    color: #555;
+    margin-bottom: 1rem;
+}
+
+.features {
+    display: flex;
+    justify-content: space-around;
+    padding: 5rem 5%;
+    background-color: #111;
+    color: #fff;
+    text-align: center;
+    flex-wrap: wrap;
+    gap: 3rem;
+}
+
+.feature-item h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.feature-item p {
+    font-size: 0.9rem;
+    color: #aaa;
+    max-width: 250px;
+    margin: 0 auto;
+}
+
+.newsletter {
+    padding: 6rem 5%;
+    text-align: center;
+    background-color: #fafafa;
+}
+
+.newsletter h2 {
+    font-size: 2rem;
+    font-weight: 300;
+    margin-bottom: 1rem;
+    letter-spacing: 2px;
+}
+
+.newsletter p {
+    color: #666;
+    margin-bottom: 2rem;
+}
+
+.newsletter form {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.newsletter input {
+    padding: 1rem 1.5rem;
+    width: 100%;
+    max-width: 450px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    outline: none;
+    font-family: inherit;
+    font-size: 0.9rem;
+}
+
+.newsletter input:focus {
+    border-color: #111;
+}
+
+.newsletter button {
+    border: none;
+    cursor: pointer;
+}
+
+footer {
+    padding: 4rem 5% 2rem;
+    background-color: #fff;
+    border-top: 1px solid #eee;
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 3rem;
+    margin-bottom: 3rem;
+}
+
+.footer-section h4 {
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.footer-section ul {
+    list-style: none;
+}
+
+.footer-section ul li {
+    margin-bottom: 0.8rem;
+}
+
+.footer-section ul a {
+    text-decoration: none;
+    color: #666;
+    font-size: 0.9rem;
+    transition: color 0.3s;
+}
+
+.footer-section ul a:hover {
+    color: #111;
+}
+
+.footer-bottom {
+    text-align: center;
+    padding-top: 2rem;
+    border-top: 1px solid #eee;
+}
+
+.footer-bottom p {
+    font-size: 0.8rem;
+    color: #999;
+    letter-spacing: 1px;
+}
+
+@media (max-width: 768px) {
+    nav ul {
+        display: none;
+    }
+    .hero h1 {
+        font-size: 2.5rem;
+    }
+}
+</style>
 </head>
 <body>
 
-    <div class="card">
-        <h1>Lançar Dado</h1>
-        <div id="display" class="display">⚀</div> 
-        <button id="btn-jogar" onclick="sortear()">Jogar Dado</button>
+<header>
+    <div class="logo">Aura</div>
+    <nav>
+        <ul>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#colecoes">Coleções</a></li>
+            <li><a href="#sobre">Sobre</a></li>
+            <li><a href="#contato">Contato</a></li>
+        </ul>
+    </nav>
+    <div class="cart">
+        <a href="#carrinho" style="text-decoration: none; color: #111; font-weight: 600;">SACOLA (0)</a>
     </div>
+</header>
 
-    <script>
-        const display = document.getElementById('display');
-        const btnJogar = document.getElementById('btn-jogar');
-        
-        // Mapeamento dos números para as faces dos dados em caracteres Unicode
-        const facesDado = {
-            1: '⚀',
-            2: '⚁',
-            3: '⚂',
-            4: '⚃',
-            5: '⚄',
-            6: '⚅'
-        };
+<main>
+    <section id="home" class="hero">
+        <h1>Nova Estação</h1>
+        <p>Descubra a elegância atemporal em nossa nova coleção. Peças desenhadas para durar e impressionar com linhas limpas e tecidos premium.</p>
+        <a href="#colecoes" class="btn">Explorar Coleção</a>
+    </section>
 
-        function sortear() {
-            // Desabilita o botão para evitar múltiplos cliques na animação
-            btnJogar.disabled = true;
-            
-            // Efeito inicial de encolher e inclinar
-            display.style.transform = 'scale(0.6) rotate(-45deg)';
-            display.style.color = '#9ca3af'; // Cor neutra durante o giro
+    <section id="colecoes" class="products">
+        <h2 class="section-title">Destaques</h2>
+        <div class="grid">
+            <article class="card">
+                <div class="card-img">
+                    <svg viewBox="0 0 24 24"><path d="M12 2L2 22h20L12 2zm0 3.8l7 14.2H5l7-14.2z"/></svg>
+                </div>
+                <div class="card-info">
+                    <h3>Blazer Estruturado</h3>
+                    <p>R$ 489,00</p>
+                    <a href="#" class="btn" style="padding: 0.5rem 1.5rem;">Comprar</a>
+                </div>
+            </article>
 
-            let giros = 0;
-            
-            // Simula o dado girando/mudando de face rapidamente antes de parar
-            const intervaloGiro = setInterval(() => {
-                const faceAleatoria = Math.floor(Math.random() * 6) + 1;
-                display.textContent = facesDado[faceAleatoria];
-                giros++;
-                
-                if (giros >= 5) {
-                    clearInterval(intervaloGiro);
-                    revelarResultadoFinal();
-                }
-            }, 80);
-        }
+            <article class="card">
+                <div class="card-img">
+                    <svg viewBox="0 0 24 24"><path d="M12 2L2 22h20L12 2zm0 3.8l7 14.2H5l7-14.2z"/></svg>
+                </div>
+                <div class="card-info">
+                    <h3>Calça Alfaiataria</h3>
+                    <p>R$ 320,00</p>
+                    <a href="#" class="btn" style="padding: 0.5rem 1.5rem;">Comprar</a>
+                </div>
+            </article>
 
-        function revelarResultadoFinal() {
-            const numeroSorteado = Math.floor(Math.random() * 6) + 1;
-            
-            // Atualiza para o caractere final do dado
-            display.textContent = facesDado[numeroSorteado];
-            
-            // Aplica o efeito bouncy de crescimento e rotação oposta
-            display.style.transform = 'scale(1.1) rotate(15deg)';
-            
-            // Define as cores personalizadas baseadas no resultado
-            if (numeroSorteado === 6) {
-                display.style.color = '#10b981'; // Verde (Sorte)
-            } else if (numeroSorteado === 1) {
-                display.style.color = '#f43f5e'; // Rosa/Vermelho (Azar)
-            } else {
-                display.style.color = '#4f46e5'; // Roxo padrão
-            }
+            <article class="card">
+                <div class="card-img">
+                    <svg viewBox="0 0 24 24"><path d="M12 2L2 22h20L12 2zm0 3.8l7 14.2H5l7-14.2z"/></svg>
+                </div>
+                <div class="card-info">
+                    <h3>Camisa Seda Pura</h3>
+                    <p>R$ 295,00</p>
+                    <a href="#" class="btn" style="padding: 0.5rem 1.5rem;">Comprar</a>
+                </div>
+            </article>
 
-            // Libera o botão após a animação concluir e estabiliza o dado
-            setTimeout(() => {
-                display.style.transform = 'scale(1) rotate(0deg)';
-                btnJogar.disabled = false;
-            }, 250);
-        }
-    </script>
+            <article class="card">
+                <div class="card-img">
+                    <svg viewBox="0 0 24 24"><path d="M12 2L2 22h20L12 2zm0 3.8l7 14.2H5l7-14.2z"/></svg>
+                </div>
+                <div class="card-info">
+                    <h3>Trench Coat Clássico</h3>
+                    <p>R$ 750,00</p>
+                    <a href="#" class="btn" style="padding: 0.5rem 1.5rem;">Comprar</a>
+                </div>
+            </article>
+            
+            <article class="card">
+                <div class="card-img">
+                    <svg viewBox="0 0 24 24"><path d="M12 2L2 22h20L12 2zm0 3.8l7 14.2H5l7-14.2z"/></svg>
+                </div>
+                <div class="card-info">
+                    <h3>Vestido Midi Reto</h3>
+                    <p>R$ 380,00</p>
+                    <a href="#" class="btn" style="padding: 0.5rem 1.5rem;">Comprar</a>
+                </div>
+            </article>
+            
+            <article class="card">
+                <div class="card-img">
+                    <svg viewBox="0 0 24 24"><path d="M12 2L2 22h20L12 2zm0 3.8l7 14.2H5l7-14.2z"/></svg>
+                </div>
+                <div class="card-info">
+                    <h3>Mocassim Couro</h3>
+                    <p>R$ 410,00</p>
+                    <a href="#" class="btn" style="padding: 0.5rem 1.5rem;">Comprar</a>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <section id="sobre" class="features">
+        <div class="feature-item">
+            <h4>Sustentabilidade</h4>
+            <p>Compromisso com o meio ambiente e materiais 100% recicláveis em nossas embalagens.</p>
+        </div>
+        <div class="feature-item">
+            <h4>Design Autoral</h4>
+            <p>Cada peça é pensada e desenvolvida por nossos designers no estúdio criativo próprio.</p>
+        </div>
+        <div class="feature-item">
+            <h4>Frete Global</h4>
+            <p>Enviamos nossos produtos para todo o mundo de forma rápida e totalmente segura.</p>
+        </div>
+    </section>
+
+    <section class="newsletter">
+        <h2>Junte-se ao nosso clube</h2>
+        <p>Receba acesso antecipado a novas coleções e convites para eventos exclusivos.</p>
+        <form onsubmit="event.preventDefault();">
+            <input type="email" placeholder="Seu endereço de e-mail" required>
+            <button type="submit" class="btn">Inscrever</button>
+        </form>
+    </section>
+</main>
+
+<footer id="contato">
+    <div class="footer-content">
+        <div class="footer-section">
+            <h4>Atendimento</h4>
+            <ul>
+                <li><a href="#">FAQ</a></li>
+                <li><a href="#">Trocas e Devoluções</a></li>
+                <li><a href="#">Rastrear Pedido</a></li>
+                <li><a href="#">Contato</a></li>
+            </ul>
+        </div>
+        <div class="footer-section">
+            <h4>Empresa</h4>
+            <ul>
+                <li><a href="#">Sobre a Aura</a></li>
+                <li><a href="#">Sustentabilidade</a></li>
+                <li><a href="#">Carreiras</a></li>
+                <li><a href="#">Termos de Serviço</a></li>
+            </ul>
+        </div>
+        <div class="footer-section">
+            <h4>Redes Sociais</h4>
+            <ul>
+                <li><a href="#">Instagram</a></li>
+                <li><a href="#">Pinterest</a></li>
+                <li><a href="#">LinkedIn</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; 2026 Aura Moda Minimalista. Todos os direitos reservados.</p>
+    </div>
+</footer>
+
 </body>
 </html>
