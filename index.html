@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jogo de Adivinhação</title>
+    <title>Jogo de Adivinhação Premium</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -25,22 +26,25 @@
             background: #1e293b;
             padding: 2.5rem;
             border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
             text-align: center;
-            max-width: 400px;
+            max-width: 420px;
             width: 90%;
+            transition: transform 0.3s ease;
         }
 
         h1 {
             color: #38bdf8;
             margin-bottom: 1rem;
-            font-size: 2rem;
+            font-size: 2.2rem;
+            font-weight: 700;
         }
 
         p {
             color: #94a3b8;
             margin-bottom: 1.5rem;
             font-size: 1rem;
+            line-height: 1.5;
         }
 
         .input-area {
@@ -52,60 +56,106 @@
 
         input[type="number"] {
             width: 100%;
-            padding: 0.75rem;
-            border-radius: 8px;
+            padding: 0.85rem;
+            border-radius: 12px;
             border: 2px solid #334155;
             background: #0f172a;
             color: #fff;
-            font-size: 1.2rem;
+            font-size: 1.4rem;
             text-align: center;
             outline: none;
-            transition: border-color 0.2s;
+            transition: all 0.2s ease;
         }
 
         input[type="number"]:focus {
             border-color: #38bdf8;
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+        }
+
+        /* Remove as setinhas padrão do input number para um visual mais limpo */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
         }
 
         button {
             width: 100%;
-            padding: 0.75rem;
+            padding: 0.85rem;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             background: #38bdf8;
             color: #0f172a;
-            font-size: 1rem;
+            font-size: 1.1rem;
             font-weight: bold;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: all 0.2s ease;
         }
 
         button:hover {
             background: #0ea5e9;
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(1px);
         }
 
         .message {
             margin-top: 1.5rem;
             font-weight: 600;
-            min-height: 24px;
+            font-size: 1.1rem;
+            min-height: 27px;
+            transition: all 0.3s ease;
         }
 
-        .hint {
-            color: #fbbf24;
-        }
-
-        .success {
-            color: #4ade80;
-        }
-
-        .error {
-            color: #f87171;
-        }
+        .hint { color: #fbbf24; }
+        .success { color: #4ade80; font-size: 1.2rem; }
+        .error { color: #f87171; }
 
         .attempts {
-            margin-top: 0.5rem;
-            font-size: 0.85rem;
+            margin-top: 0.75rem;
+            font-size: 0.9rem;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        /* Estilo do histórico de palpites */
+        .history-container {
+            margin-top: 1.5rem;
+            border-top: 1px solid #334155;
+            padding-top: 1rem;
+        }
+
+        .history-title {
+            font-size: 0.8rem;
             color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .history-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+            min-height: 28px;
+        }
+
+        .badge {
+            background: #334155;
+            color: #cbd5e1;
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            animation: popIn 0.2s ease forwards;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
         }
 
         .restart-btn {
@@ -122,32 +172,40 @@
 
     <div class="container">
         <h1>Adivinhe o Número</h1>
-        <p>Tente adivinhar o número secreto entre 1 e 100.</p>
+        <p>Tente adivinhar o número secreto entre <strong>1 e 100</strong>.</p>
 
         <div class="input-area">
-            <input type="number" id="guessInput" min="1" max="100" placeholder="Digite seu palpite">
+            <input type="number" id="guessInput" min="1" max="100" placeholder="Digite seu palpite" autocomplete="off">
             <button id="submitBtn">Enviar Palpite</button>
-            <button id="restartBtn" class="restart-btn">Jogar Novamente</button>
+            <button id="restartBtn" class="restart-btn">Jogar Novamente 🎉</button>
         </div>
 
         <div id="message" class="message"></div>
         <div id="attempts" class="attempts"></div>
+
+        <div class="history-container">
+            <div class="history-title">Seus Palpites</div>
+            <div id="historyBadges" class="history-badges"></div>
+        </div>
     </div>
 
     <script>
         let secretNumber;
         let attemptsLeft;
         const maxAttempts = 10;
+        let guessHistory = [];
 
         const guessInput = document.getElementById('guessInput');
         const submitBtn = document.getElementById('submitBtn');
         const restartBtn = document.getElementById('restartBtn');
         const messageDisplay = document.getElementById('message');
         const attemptsDisplay = document.getElementById('attempts');
+        const historyBadges = document.getElementById('historyBadges');
 
         function initGame() {
             secretNumber = Math.floor(Math.random() * 100) + 1;
             attemptsLeft = maxAttempts;
+            guessHistory = [];
             
             guessInput.value = '';
             guessInput.disabled = false;
@@ -156,37 +214,61 @@
             
             messageDisplay.textContent = '';
             messageDisplay.className = 'message';
+            historyBadges.innerHTML = ''; 
+            
             updateAttemptsDisplay();
+            guessInput.focus();
         }
 
         function updateAttemptsDisplay() {
-            attemptsDisplay.textContent = `Tentativas restantes: ${attemptsLeft}`;
+            attemptsDisplay.innerHTML = `Tentativas restantes: <strong>${attemptsLeft}</strong>`;
+        }
+
+        function renderHistory(newGuess) {
+            const badge = document.createElement('span');
+            badge.className = 'badge';
+            badge.textContent = newGuess;
+            historyBadges.appendChild(badge);
         }
 
         function checkGuess() {
             const userGuess = parseInt(guessInput.value);
 
             if (isNaN(userGuess) || userGuess < 1 || userGuess > 100) {
-                messageDisplay.textContent = 'Por favor, insira um número válido entre 1 e 100.';
+                messageDisplay.textContent = '❌ Por favor, insira um número válido entre 1 e 100.';
                 messageDisplay.className = 'message error';
                 return;
             }
 
+            if (guessHistory.includes(userGuess)) {
+                messageDisplay.textContent = '⚠️ Você já tentou esse número! Escolha outro.';
+                messageDisplay.className = 'message hint';
+                return;
+            }
+
             attemptsLeft--;
+            guessHistory.push(userGuess);
+            renderHistory(userGuess);
 
             if (userGuess === secretNumber) {
-                messageDisplay.textContent = `Parabéns! Você acertou! O número era ${secretNumber}.`;
+                messageDisplay.textContent = `🎉 Parabéns! Você acertou! O número era ${secretNumber}.`;
                 messageDisplay.className = 'message success';
+                // Dispara os confetes da biblioteca importada
+                confetti({
+                    particleCount: 150,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
                 endGame();
             } else if (attemptsLeft === 0) {
-                messageDisplay.textContent = `Fim de jogo! Você esgotou as tentativas. O número era ${secretNumber}.`;
+                messageDisplay.textContent = `💥 Fim de jogo! Suas tentativas acabaram. O número era ${secretNumber}.`;
                 messageDisplay.className = 'message error';
                 endGame();
             } else {
                 if (userGuess < secretNumber) {
-                    messageDisplay.textContent = 'Muito baixo! Tente um número maior.';
+                    messageDisplay.textContent = '🔼 Muito baixo! Tente um número maior.';
                 } else {
-                    messageDisplay.textContent = 'Muito alto! Tente um número menor.';
+                    messageDisplay.textContent = '🔽 Muito alto! Tente um número menor.';
                 }
                 messageDisplay.className = 'message hint';
                 updateAttemptsDisplay();
@@ -201,6 +283,7 @@
             submitBtn.style.display = 'none';
             restartBtn.style.display = 'block';
             attemptsDisplay.textContent = '';
+            restartBtn.focus();
         }
 
         submitBtn.addEventListener('click', checkGuess);
@@ -213,6 +296,7 @@
 
         restartBtn.addEventListener('click', initGame);
 
+        // Inicializa o jogo assim que a página carrega
         initGame();
     </script>
 </body>
