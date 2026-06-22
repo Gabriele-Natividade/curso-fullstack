@@ -249,7 +249,7 @@
             totalTasksEl.textContent = total;
             completedTasksEl.textContent = total > 0 ? `${completed} de ${total}` : '0';
         }
-
+//FUNÇÕES
         function renderTasks() {
             todoList.innerHTML = '';
 
@@ -308,18 +308,18 @@
             renderTasks();
         }
 
-        // Segurança simples contra XSS ao renderizar texto do usuário
+        // FINALIZAÇÃO
         function escapeHTML(str) {
             return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
         }
 
-        // Eventos
+        
         btnAdd.addEventListener('click', addTask);
         todoInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') addTask();
         });
 
-        // Inicialização
+        
         renderTasks();
     </script>
 </body>
