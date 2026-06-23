@@ -130,7 +130,7 @@
             padding: 1rem;
             border-radius: 6px;
             border: 1px solid var(--border);
-            transition: transform 0.2s, opacity 0.2s;
+            transition: transform 0.2s, opacity 0.2s, background 0.2s;
         }
 
         .todo-item.completed {
@@ -142,185 +142,22 @@
             color: var(--text-support);
         }
 
-        .todo-content {
+        .btn-toggle-status {
             display: flex;
             align-items: center;
             gap: 0.75rem;
             cursor: pointer;
             flex: 1;
-        }
-
-        .checkbox {
-            width: 18px;
-            height: 18px;
-            border: 2px solid var(--primary);
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .todo-item.completed .checkbox {
-            background: var(--primary);
-        }
-
-        .todo-item.completed .checkbox::after {
-            content: "✓";
-            color: #fff;
-            font-size: 0.75rem;
-            font-weight: bold;
-        }
-
-        .todo-text {
-            font-size: 0.95rem;
-            word-break: break-word;
-        }
-
-        .btn-delete {
             background: transparent;
             border: none;
-            color: var(--text-support);
-            cursor: pointer;
-            font-size: 1.1rem;
-            padding: 0.2rem 0.5rem;
+            text-align: left;
+            color: inherit;
+        }
+
+        .btn-toggle-status:focus-visible {
+            outline: 1px solid var(--primary);
+            outline-offset: 4px;
             border-radius: 4px;
-            transition: color 0.2s, background 0.2s;
         }
 
-        .btn-delete:hover {
-            color: var(--danger);
-            background: rgba(247, 90, 104, 0.1);
-        }
-
-        .empty-state {
-            text-align: center;
-            color: var(--text-support);
-            padding: 2rem 0;
-            font-size: 0.9rem;
-        }
-    </style>
-</head>
-<body>
-
-    <div class="container">
-        <header>
-            <h1>FocusTracker</h1>
-            <p>Organize suas tarefas diárias com foco e clareza</p>
-        </header>
-
-        <div class="stats-container">
-            <div class="stat-item">
-                <span>Criadas</span>
-                <strong id="total-tasks">0</strong>
-            </div>
-            <div class="stat-item">
-                <span>Concluídas</span>
-                <strong id="completed-tasks">0 de 0</strong>
-            </div>
-        </div>
-
-        <div class="input-group">
-            <input type="text" id="todo-input" placeholder="Adicione uma nova tarefa..." maxlength="100">
-            <button class="btn-add" id="btn-add">Criar</button>
-        </div>
-
-        <ul class="todo-list" id="todo-list">
-            </ul>
-    </div>
-
-    <script>
-        const todoInput = document.getElementById('todo-input');
-        const btnAdd = document.getElementById('btn-add');
-        const todoList = document.getElementById('todo-list');
-        const totalTasksEl = document.getElementById('total-tasks');
-        const completedTasksEl = document.getElementById('completed-tasks');
-
-        // Carrega tarefas salvas ou inicia array vazio
-        let tasks = JSON.parse(localStorage.getItem('focus_tasks')) || [];
-
-        function saveToStorage() {
-            localStorage.setItem('focus_tasks', JSON.stringify(tasks));
-        }
-
-        function updateCounters() {
-            const total = tasks.length;
-            const completed = tasks.filter(t => t.completed).length;
-
-            totalTasksEl.textContent = total;
-            completedTasksEl.textContent = total > 0 ? `${completed} de ${total}` : '0';
-        }
-//FUNÇÕES
-        function renderTasks() {
-            todoList.innerHTML = '';
-
-            if (tasks.length === 0) {
-                todoList.innerHTML = '<p class="empty-state">Nenhuma tarefa cadastrada. Comece adicionando uma!</p>';
-                updateCounters();
-                return;
-            }
-
-            tasks.forEach(task => {
-                const li = document.createElement('li');
-                li.className = `todo-item ${task.completed ? 'completed' : ''}`;
-
-                li.innerHTML = `
-                    <div class="todo-content" onclick="toggleTask(${task.id})">
-                        <div class="checkbox"></div>
-                        <span class="todo-text">${escapeHTML(task.text)}</span>
-                    </div>
-                    <button class="btn-delete" onclick="deleteTask(${task.id})" title="Excluir tarefa">✕</button>
-                `;
-
-                todoList.appendChild(li);
-            });
-
-            updateCounters();
-        }
-
-        function addTask() {
-            const text = todoInput.value.trim();
-            if (!text) return;
-
-            const newTask = {
-                id: Date.now(),
-                text: text,
-                completed: false
-            };
-
-            tasks.push(newTask);
-            todoInput.value = '';
-            
-            saveToStorage();
-            renderTasks();
-        }
-
-        function toggleTask(id) {
-            tasks = tasks.map(task => 
-                task.id === id ? { ...task, completed: !task.completed } : task
-            );
-            saveToStorage();
-            renderTasks();
-        }
-
-        function deleteTask(id) {
-            tasks = tasks.filter(task => task.id !== id);
-            saveToStorage();
-            renderTasks();
-        }
-
-        // FINALIZAÇÃO
-        function escapeHTML(str) {
-            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-        }
-
-        
-        btnAdd.addEventListener('click', addTask);
-        todoInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') addTask();
-        });
-
-        
-        renderTasks();
-    </script>
-</body>
-</html>
+        .checkbox
