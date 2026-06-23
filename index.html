@@ -160,4 +160,45 @@
             border-radius: 4px;
         }
 
-        .checkbox
+        /* --- Modificações e Correções Solicitadas --- */
+        .checkbox {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--primary);
+            border-radius: 50%; /* Formato circular moderno */
+            display: inline-block;
+            position: relative;
+            transition: background-color 0.2s, border-color 0.2s;
+            flex-shrink: 0;
+        }
+
+        .todo-item.completed .checkbox {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .todo-item.completed .checkbox::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .todo-text {
+            font-size: 1rem;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+
+        .btn-delete {
+            background: transparent;
+            border: none;
+            color: var(--text-support);
+            cursor: pointer;
+            padding: 0.4rem;
+            border-radius: 4px;
+            font-size: 1
