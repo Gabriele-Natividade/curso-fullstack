@@ -3,202 +3,348 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FocusTracker | Gerenciador de Tarefas</title>
+    <title>Snake Game Arcade</title>
     <style>
-        :root {
-            --bg-color: #121214;
-            --card-bg: #202024;
-            --text-color: #e1e1e6;
-            --text-support: #8d8d99;
-            --primary: #00b37e;
-            --primary-hover: #00875f;
-            --danger: #f75a68;
-            --border: #323238;
-        }
-
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            padding: 2rem 1rem;
-            display: flex;
-            justify-content: center;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 600px;
-            background: var(--card-bg);
-            padding: 2rem;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-        }
-
-        header {
-            margin-bottom: 2rem;
-            text-align: center;
-        }
-
-        header h1 {
-            color: var(--primary);
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-        }
-
-        header p {
-            color: var(--text-support);
-            font-size: 0.9rem;
-        }
-
-        .stats-container {
-            display: flex;
-            justify-content: space-between;
-            background: var(--bg-color);
-            padding: 1rem;
-            border-radius: 6px;
-            margin-bottom: 1.5rem;
-            border: 1px solid var(--border);
-        }
-
-        .stat-item span {
-            display: block;
-            font-size: 0.85rem;
-            color: var(--text-support);
-        }
-
-        .stat-item strong {
-            font-size: 1.2rem;
-            color: var(--text-color);
-        }
-
-        .input-group {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 2rem;
-        }
-
-        input[type="text"] {
-            flex: 1;
-            background: var(--bg-color);
-            border: 1px solid var(--border);
-            padding: 0.8rem;
-            border-radius: 6px;
-            color: var(--text-color);
-            font-size: 1rem;
-            transition: border-color 0.2s;
-        }
-
-        input[type="text"]:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        button.btn-add {
-            background: var(--primary);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(circle, #1a1a2e 0%, #0f0f1a 100%);
             color: #fff;
-            border: none;
-            padding: 0 1.5rem;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        button.btn-add:hover {
-            background: var(--primary-hover);
-        }
-
-        .todo-list {
-            list-style: none;
             display: flex;
             flex-direction: column;
-            gap: 0.75rem;
-        }
-
-        .todo-item {
-            display: flex;
             align-items: center;
-            justify-content: space-between;
-            background: var(--bg-color);
-            padding: 1rem;
-            border-radius: 6px;
-            border: 1px solid var(--border);
-            transition: transform 0.2s, opacity 0.2s, background 0.2s;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
         }
 
-        .todo-item.completed {
-            opacity: 0.6;
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: #00ffcc;
+            text-shadow: 0 0 10px rgba(0, 255, 204, 0.6);
         }
 
-        .todo-item.completed .todo-text {
-            text-decoration: line-through;
-            color: var(--text-support);
-        }
-
-        .btn-toggle-status {
+        #placar-container {
             display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            cursor: pointer;
-            flex: 1;
-            background: transparent;
-            border: none;
-            text-align: left;
-            color: inherit;
+            gap: 40px;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .btn-toggle-status:focus-visible {
-            outline: 1px solid var(--primary);
-            outline-offset: 4px;
-            border-radius: 4px;
-        }
-
-        /* --- Modificações e Correções Solicitadas --- */
-        .checkbox {
-            width: 18px;
-            height: 18px;
-            border: 2px solid var(--primary);
-            border-radius: 50%; /* Formato circular moderno */
-            display: inline-block;
-            position: relative;
-            transition: background-color 0.2s, border-color 0.2s;
-            flex-shrink: 0;
-        }
-
-        .todo-item.completed .checkbox {
-            background-color: var(--primary);
-            border-color: var(--primary);
-        }
-
-        .todo-item.completed .checkbox::after {
-            content: '✓';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #fff;
-            font-size: 0.7rem;
+        span {
             font-weight: bold;
+            color: #ff007f;
         }
 
-        .todo-text {
-            font-size: 1rem;
-            line-height: 1.4;
-            word-break: break-word;
+        #score {
+            color: #00ffcc;
         }
 
-        .btn-delete {
-            background: transparent;
+        #canvas-container {
+            position: relative;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.7), 0 0 15px rgba(0, 255, 204, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 4px solid #3d3d5c;
+        }
+
+        canvas {
+            background-color: #05050a;
+            display: block;
+        }
+
+        #tela-over {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 15, 26, 0.85);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #tela-over.ativo {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        #tela-over h2 {
+            font-size: 3rem;
+            color: #ff0055;
+            margin-bottom: 15px;
+            text-shadow: 0 0 15px rgba(255, 0, 85, 0.6);
+        }
+
+        .btn {
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            background: #00ffcc;
+            color: #0f0f1a;
             border: none;
-            color: var(--text-support);
+            border-radius: 5px;
             cursor: pointer;
-            padding: 0.4rem;
-            border-radius: 4px;
-            font-size: 1
+            box-shadow: 0 4px 15px rgba(0, 255, 204, 0.4);
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+        }
+
+        .btn:hover {
+            background: #fff;
+            transform: scale(1.05);
+            box-shadow: 0 4px 20px rgba(255, 255, 255, 0.6);
+        }
+
+        #controles-dica {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #888;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Snake Arcade</h1>
+
+    <div id="placar-container">
+        <div>Pontos: <span id="score">0</span></div>
+        <div>Recorde: <span id="highscore">0</span></div>
+    </div>
+
+    <div id="canvas-container">
+        <canvas id="gameCanvas" width="400" height="400"></canvas>
+        
+        <div id="tela-over" class="ativo">
+            <h2 id="titulo-tela">Iniciar Jogo</h2>
+            <button class="btn" id="btn-jogar" onclick="iniciarJogo()">Jogar</button>
+        </div>
+    </div>
+
+    <div id="controles-dica">
+        Use as Setas do teclado ou W, A, S, D para se movimentar.
+    </div>
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        const scoreElement = document.getElementById("score");
+        const highscoreElement = document.getElementById("highscore");
+        const telaOver = document.getElementById("tela-over");
+        const tituloTela = document.getElementById("titulo-tela");
+        const btnJogar = document.getElementById("btn-jogar");
+
+        const tamanhoBloco = 20;
+        const linhas = canvas.height / tamanhoBloco;
+        const colunas = canvas.width / tamanhoBloco;
+
+        let cobra;
+        let comida;
+        let dx;
+        let dy;
+        let pontuacao;
+        let jogoRodando = false;
+        let loopJogo;
+        let velocidade = 100; // milissegundos por frame (menor = mais rápido)
+
+        // Carrega o Recorde do LocalStorage
+        let recorde = localStorage.getItem("snake_highscore") || 0;
+        highscoreElement.innerText = recorde;
+
+        // Captura as teclas pressionadas
+        window.addEventListener("keydown", mudarDirecao);
+
+        function iniciarJogo() {
+            // Reset de variáveis
+            cobra = [
+                {x: 10, y: 10},
+                {x: 9, y: 10},
+                {x: 8, y: 10}
+            ];
+            dx = 1;
+            dy = 0;
+            pontuacao = 0;
+            scoreElement.innerText = pontuacao;
+            
+            gerarComida();
+            telaOver.classList.remove("ativo");
+            jogoRodando = true;
+
+            // Limpa loop anterior se houver e inicia um novo
+            clearInterval(loopJogo);
+            loopJogo = setInterval(atualizar, velocidade);
+        }
+
+        function atualizar() {
+            if (!jogoRodando) return;
+
+            moverCobra();
+
+            if (verificarColisao()) {
+                fimDeJogo();
+                return;
+            }
+
+            verificarComida();
+            desenhar();
+        }
+
+        function desenhar() {
+            // Limpa o Canvas
+            ctx.fillStyle = "#05050a";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Desenha uma grade de fundo sutil
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.02)";
+            for (let i = 0; i < linhas; i++) {
+                ctx.beginPath();
+                ctx.moveTo(i * tamanhoBloco, 0);
+                ctx.lineTo(i * tamanhoBloco, canvas.height);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(0, i * tamanhoBloco);
+                ctx.lineTo(canvas.width, i * tamanhoBloco);
+                ctx.stroke();
+            }
+
+            // Desenha a Comida (com brilho)
+            ctx.fillStyle = "#ff0055";
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = "#ff0055";
+            ctx.fillRect(comida.x * tamanhoBloco + 1, comida.y * tamanhoBloco + 1, tamanhoBloco - 2, tamanhoBloco - 2);
+
+            // Desenha a Cobra
+            cobra.forEach((pedaco, index) => {
+                // A cabeça é de uma cor ligeiramente diferente e mais brilhante
+                if (index === 0) {
+                    ctx.fillStyle = "#00ffcc";
+                    ctx.shadowColor = "#00ffcc";
+                } else {
+                    ctx.fillStyle = "#00b399";
+                    ctx.shadowColor = "transparent";
+                    ctx.shadowBlur = 0;
+                }
+                
+                ctx.fillRect(pedaco.x * tamanhoBloco + 1, pedaco.y * tamanhoBloco + 1, tamanhoBloco - 2, tamanhoBloco - 2);
+            });
+            
+            // Reset do shadowBlur para não afetar outras coisas
+            ctx.shadowBlur = 0;
+        }
+
+        function moverCobra() {
+            // Cria a nova cabeça baseada na direção atual
+            const cabeca = {x: cobra[0].x + dx, y: cobra[0].y + dy};
+            cobra.unshift(cabeca); // Adiciona no início do array
+            cobra.pop(); // Remove o último pedaço (mantém o tamanho se não comer)
+        }
+
+        function mudarDirecao(evento) {
+            const TECLA_ESQUERDA = 37, TECLA_A = 65;
+            const TECLA_CIMA = 38,     TECLA_W = 87;
+            const TECLA_DIREITA = 39,  TECLA_D = 68;
+            const TECLA_BAIXO = 40,    TECLA_S = 83;
+
+            const teclaPressionada = evento.keyCode;
+
+            const indoParaCima = dy === -1;
+            const indoParaBaixo = dy === 1;
+            const indoParaDireita = dx === 1;
+            const indoParaEsquerda = dx === -1;
+
+            // Evita que a cobra volte diretamente sobre si mesma
+            if ((teclaPressionada === TECLA_ESQUERDA || teclaPressionada === TECLA_A) && !indoParaDireita) {
+                dx = -1; dy = 0;
+            }
+            if ((teclaPressionada === TECLA_CIMA || teclaPressionada === TECLA_W) && !indoParaBaixo) {
+                dx = 0; dy = -1;
+            }
+            if ((teclaPressionada === TECLA_DIREITA || teclaPressionada === TECLA_D) && !indoParaEsquerda) {
+                dx = 1; dy = 0;
+            }
+            if ((teclaPressionada === TECLA_BAIXO || teclaPressionada === TECLA_S) && !indoParaCima) {
+                dx = 0; dy = 1;
+            }
+        }
+
+        function gerarComida() {
+            comida = {
+                x: Math.floor(Math.random() * colunas),
+                y: Math.floor(Math.random() * linhas)
+            };
+
+            // Garante que a comida não nasça em cima da cobra
+            cobra.forEach(pedaco => {
+                if (pedaco.x === comida.x && pedaco.y === comida.y) {
+                    gerarComida();
+                }
+            });
+        }
+
+        function verificarComida() {
+            if (cobra[0].x === comida.x && cobra[0].y === comida.y) {
+                pontuacao += 10;
+                scoreElement.innerText = pontuacao;
+                
+                // Cresce a cobra duplicando o último pedaço
+                const rabo = { ...cobra[cobra.length - 1] };
+                cobra.push(rabo);
+                
+                gerarComida();
+            }
+        }
+
+        function verificarColisao() {
+            const cabeca = cobra[0];
+
+            // Colisão com as paredes
+            if (cabeca.x < 0 || cabeca.x >= colunas || cabeca.y < 0 || cabeca.y >= linhas) {
+                return true;
+            }
+
+            // Colisão com o próprio corpo
+            for (let i = 1; i < cobra.length; i++) {
+                if (cabeca.x === cobra[i].x && cabeca.y === cobra[i].y) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        function fimDeJogo() {
+            jogoRodando = false;
+            clearInterval(loopJogo);
+
+            // Atualiza Recorde
+            if (pontuacao > recorde) {
+                recorde = pontuacao;
+                localStorage.setItem("snake_highscore", recorde);
+                highscoreElement.innerText = recorde;
+            }
+
+            tituloTela.innerText = "Game Over";
+            btnJogar.innerText = "Tentar Novamente";
+            telaOver.classList.add("ativo");
+        }
+    </script>
+</body>
+</html>
