@@ -1,202 +1,67 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jogo Pong Clássico</title>
+    <title>Pong Curto</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            background-color: #111;
-            color: white;
-            font-family: 'Courier New', Courier, monospace;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            overflow: hidden;
-        }
-        h1 {
-            margin-bottom: 10px;
-            font-size: 24px;
-            letter-spacing: 2px;
-        }
-        #paineis {
-            display: flex;
-            justify-content: space-between;
-            width: 800px;
-            font-size: 30px;
-            margin-bottom: 10px;
-            padding: 0 50px;
-        }
-        canvas {
-            border: 4px solid white;
-            background-color: #000;
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
-        }
-        p {
-            margin-top: 15px;
-            color: #aaa;
-            font-size: 14px;
-        }
+        body { background: #111; color: #fff; font-family: sans-serif; text-align: center; margin: 0; overflow: hidden; }
+        canvas { border: 4px solid #fff; background: #000; margin-top: 20px; }
     </style>
 </head>
 <body>
-
-    <h1>PONG</h1>
-    
-    <div id="paineis">
-        <span id="playerScore">0</span>
-        <span id="botScore">0</span>
-    </div>
-
-    <canvas id="gameCanvas" width="800" height="500"></canvas>
-
-    <p>Use as setas <strong>↑ (Para Cima)</strong> e <strong>↓ (Para Baixo)</strong> para mover sua raquete.</p>
+    <h2><span id="p1">0</span> : <span id="p2">0</span></h2>
+    <canvas id="c" width="800" height="500"></canvas>
+    <p>Use as setas ↑ e ↓</p>
 
     <script>
-        const canvas = document.getElementById("gameCanvas");
-        const ctx = canvas.getContext("2d");
-
-        // Elementos do placar
-        const playerScoreTxt = document.getElementById("playerScore");
-        const botScoreTxt = document.getElementById("botScore");
-
-        // Configurações da Raquete
-        const paddleWidth = 10;
-        const paddleHeight = 100;
-
-        // Jogador (Esquerda)
-        const player = {
-            x: 10,
-            y: canvas.height / 2 - paddleHeight / 2,
-            score: 0,
-            dy: 0,
-            speed: 8
-        };
-
-        // Computador (Direita)
-        const bot = {
-            x: canvas.width - 20,
-            y: canvas.height / 2 - paddleHeight / 2,
-            score: 0,
-            speed: 4.5 // Altere aqui para ficar mais fácil ou difícil
-        };
-
-        // Bola
-        const ball = {
-            x: canvas.width / 2,
-            y: canvas.height / 2,
-            radius: 7,
-            speed: 5,
-            dx: 5,
-            dy: 5
-        };
-
-        // Movimentação do jogador
-        document.addEventListener("keydown", (e) => {
-            if (e.key === "ArrowUp") player.dy = -player.speed;
-            if (e.key === "ArrowDown") player.dy = player.speed;
-        });
-
-        document.addEventListener("keyup", (e) => {
-            if (e.key === "ArrowUp" || e.key === "ArrowDown") player.dy = 0;
-        });
-
-        // Resetar a bola no centro
-        function resetBall() {
-            ball.x = canvas.width / 2;
-            ball.y = canvas.height / 2;
-            ball.dx = -ball.dx; // Muda a direção de quem saca
-            ball.speed = 5;     // Reseta a velocidade
-        }
-
-        // Desenhar elementos na tela
-        function draw() {
-            // Limpar Canvas
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // Linha tracejada central
-            ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
-            ctx.lineWidth = 2;
-            ctx.setLineDash([10, 10]);
-            ctx.beginPath();
-            ctx.moveTo(canvas.width / 2, 0);
-            ctx.lineTo(canvas.width / 2, canvas.height);
-            ctx.stroke();
-            ctx.setLineDash([]); // Reseta o estilo da linha
-
-            // Desenhar raquetes
-            ctx.fillStyle = "white";
-            ctx.fillRect(player.x, player.y, paddleWidth, paddleHeight);
-            ctx.fillRect(bot.x, bot.y, paddleWidth, paddleHeight);
-
-            // Desenhar bola (quadradinha para estilo retro)
-            ctx.fillRect(ball.x - ball.radius, ball.y - ball.radius, ball.radius * 2, ball.radius * 2);
-        }
-
-        // Lógica de física e IA
-        function update() {
-            // Mover jogador e prender na tela
-            player.y += player.dy;
-            if (player.y < 0) player.y = 0;
-            if (player.y + paddleHeight > canvas.height) player.y = canvas.height - paddleHeight;
-
-            // IA simples do Computador (segue a bola)
-            let targetY = ball.y - paddleHeight / 2;
-            bot.y += (targetY - bot.y) * 0.12; // Suavização do movimento
-            
-            // Prender bot na tela
-            if (bot.y < 0) bot.y = 0;
-            if (bot.y + paddleHeight > canvas.height) bot.y = canvas.height - paddleHeight;
-
-            // Mover Bola
-            ball.x += ball.dx;
-            ball.y += ball.dy;
-
-            // Colisão da bola com teto e chão
-            if (ball.y - ball.radius < 0 || ball.y + ball.radius > canvas.height) {
-                ball.dy = -ball.dy;
-            }
-
-            // Verificar colisão com a raquete do jogador
-            if (ball.dx < 0 && ball.x - ball.radius <= player.x + paddleWidth && ball.y >= player.y && ball.y <= player.y + paddleHeight) {
-                ball.dx = -ball.dx;
-                ball.speed += 0.5; // Aumenta a velocidade para dar emoção
-            }
-
-            // Verificar colisão com a raquete do bot
-            if (ball.dx > 0 && ball.x + ball.radius >= bot.x && ball.y >= bot.y && ball.y <= bot.y + paddleHeight) {
-                ball.dx = -ball.dx;
-                ball.speed += 0.5;
-            }
-
-            // Sistema de Pontuação
-            if (ball.x - ball.radius < 0) {
-                bot.score++;
-                botScoreTxt.innerText = bot.score;
-                resetBall();
-            } else if (ball.x + ball.radius > canvas.width) {
-                player.score++;
-                playerScoreTxt.innerText = player.score;
-                resetBall();
-            }
-        }
-
+        const canvas = document.getElementById("c"), ctx = canvas.getContext("2d");
+        const p1S = document.getElementById("p1"), p2S = document.getElementById("p2");
         
-        function gameLoop() {
-            update();
-            draw();
-            requestAnimationFrame(gameLoop);
-        }
+        let p1Y = 200, p2Y = 200, p1Score = 0, p2Score = 0, dy = 0;
+        let bX = 400, bY = 250, bDX = 5, bDY = 5;
 
-        // Iniciar o jogo
-        gameLoop();
+        document.addEventListener("keydown", e => dy = e.key === "ArrowUp" ? -7 : e.key === "ArrowDown" ? 7 : 0);
+        document.addEventListener("keyup", () => dy = 0);
+
+        function reset() { bX = 400; bY = 250; bDX = -bDX; }
+
+        function loop() {
+            // Movimento Jogador
+            p1Y = Math.max(0, Math.min(400, p1Y + dy));
+            // IA do Bot
+            p2Y += (bY - 50 - p2Y) * 0.1;
+            p2Y = Math.max(0, Math.min(400, p2Y));
+
+            // Movimento Bola
+            bX += bDX; bY += bDY;
+
+            // Colisão Paredes
+            if (bY < 10 || bY > 490) bDY = -bDY;
+
+            // Colisão Raquetes
+            if (bDX < 0 && bX < 25 && bY > p1Y && bY < p1Y + 100) bDX = -bDX * 1.05;
+            if (bDX > 0 && bX > 775 && bY > p2Y && bY < p2Y + 100) bDX = -bDX * 1.05;
+
+            // Pontuação
+            if (bX < 0) { p2Score++; p2S.innerText = p2Score; reset(); }
+            if (bX > 800) { p1Score++; p1S.innerText = p1Score; reset(); }
+
+            // Desenhar tudo
+            ctx.clearRect(0, 0, 800, 500);
+            ctx.fillStyle = "white";
+            ctx.fillRect(10, p1Y, 10, 100); // Jogador
+            ctx.fillRect(780, p2Y, 10, 100); // Bot
+            ctx.fillRect(bX - 5, bY - 5, 10, 100); // Linha Central (reaproveitando altura para economizar)
+            
+            // Corrige o desenho da bola apagando o retângulo gigante e desenhando o quadrado certo
+            ctx.clearRect(0,0,800,500);
+            ctx.fillRect(10, p1Y, 10, 100);
+            ctx.fillRect(780, p2Y, 10, 100);
+            ctx.fillRect(bX - 6, bY - 6, 12, 12); // Bola
+
+            requestAnimationFrame(loop);
+        }
+        loop();
     </script>
 </body>
 </html>
