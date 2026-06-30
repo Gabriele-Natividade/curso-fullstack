@@ -2,15 +2,16 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Snake Game</title>
+    <title>Retro Snake Game</title>
     <style>
-        body { background: #111; color: #fff; text-align: center; font-family: sans-serif; }
-        canvas { background: #000; border: 3px solid #fff; display: block; margin: 20px auto; }
+        body { background: #1a0826; color: #fff30a; text-align: center; font-family: 'Courier New', monospace; }
+        h1 { text-transform: uppercase; letter-spacing: 2px; }
+        canvas { background: #0c0214; border: 4px dashed #ff0055; display: block; margin: 20px auto; box-shadow: 0 0 20px #ff0055; }
     </style>
 </head>
 <body>
 
-    <h1>Pontos: <span id="score">0</span></h1>
+    <h1>Score: <span id="score">0</span></h1>
     <canvas id="game" width="400" height="400"></canvas>
 
     <script>
@@ -18,22 +19,22 @@
         const ctx = canvas.getContext("2d");
         const tam = 20, limite = 20;
         
-        let cobra = [{x: 10, y: 10}];
+        let cobra = [{x: 10, y: 10}, {x: 9, y: 10}];
         let comida = {x: 15, y: 15};
         let dx = 1, dy = 0, pontos = 0;
 
         window.addEventListener("keydown", e => {
-            if (e.key === "ArrowLeft" && dx === 0) { dx = -1; dy = 0; }
-            if (e.key === "ArrowUp" && dy === 0) { dx = 0; dy = -1; }
-            if (e.key === "ArrowRight" && dx === 0) { dx = 1; dy = 0; }
-            if (e.key === "ArrowDown" && dy === 0) { dx = 0; dy = 1; }
+            if ((e.key === "ArrowLeft" || e.key.toLowerCase() === "a") && dx === 0) { dx = -1; dy = 0; }
+            if ((e.key === "ArrowUp" || e.key.toLowerCase() === "w") && dy === 0) { dx = 0; dy = -1; }
+            if ((e.key === "ArrowRight" || e.key.toLowerCase() === "d") && dx === 0) { dx = 1; dy = 0; }
+            if ((e.key === "ArrowDown" || e.key.toLowerCase() === "s") && dy === 0) { dx = 0; dy = 1; }
         });
 
         function jogo() {
             let cabeca = { x: cobra[0].x + dx, y: cobra[0].y + dy };
 
             if (cabeca.x < 0 || cabeca.x >= limite || cabeca.y < 0 || cabeca.y >= limite || cobra.some(p => p.x === cabeca.x && p.y === cabeca.y)) {
-                cobra = [{x: 10, y: 10}];
+                cobra = [{x: 10, y: 10}, {x: 9, y: 10}];
                 dx = 1; dy = 0; pontos = 0;
                 document.getElementById("score").innerText = pontos;
                 return;
@@ -42,24 +43,32 @@
             cobra.unshift(cabeca);
 
             if (cabeca.x === comida.x && cabeca.y === comida.y) {
-                pontos++;
+                pontos += 10;
                 document.getElementById("score").innerText = pontos;
                 comida = { x: Math.floor(Math.random() * limite), y: Math.floor(Math.random() * limite) };
             } else {
                 cobra.pop();
             }
 
-            ctx.fillStyle = "#000";
+            ctx.fillStyle = "#0c0214";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            ctx.fillStyle = "red";
-            ctx.fillRect(comida.x * tam, comida.y * tam, tam - 2, tam - 2);
+            ctx.strokeStyle = "#1f0b33";
+            for (let i = 0; i < canvas.width; i += tam) {
+                ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(canvas.width, i); ctx.stroke();
+            }
 
-            ctx.fillStyle = "lime";
-            cobra.forEach(p => ctx.fillRect(p.x * tam, p.y * tam, tam - 2, tam - 2));
+            ctx.fillStyle = "#00ff66";
+            ctx.fillRect(comida.x * tam + 2, comida.y * tam + 2, tam - 4, tam - 4);
+
+            cobra.forEach((p, i) => {
+                ctx.fillStyle = i === 0 ? "#ffff00" : "#b3b300";
+                ctx.fillRect(p.x * tam + 1, p.y * tam + 1, tam - 2, tam - 2);
+            });
         }
 
-        setInterval(jogo, 100);
+        setInterval(jogo, 70);
     </script>
 </body>
 </html>
