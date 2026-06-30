@@ -2,111 +2,64 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Snake Game</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
-        body { background: #0f0f1a; color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
-        h1 { font-size: 2.5rem; color: #00ffcc; margin-bottom: 10px; }
-        #placar-container { display: flex; gap: 40px; font-size: 1.2rem; margin-bottom: 15px; background: rgba(255,255,255,0.05); padding: 10px 20px; border-radius: 8px; }
-        #canvas-container { position: relative; border: 4px solid #3d3d5c; border-radius: 10px; }
-        canvas { background: #05050a; display: block; }
-        #tela-over { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,15,26,0.9); display: none; flex-direction: column; align-items: center; justify-content: center; }
-        #tela-over.ativo { display: flex; }
-        #tela-over h2 { font-size: 3rem; color: #ff0055; margin-bottom: 15px; }
-        .btn { padding: 12px 30px; font-size: 1.1rem; font-weight: bold; background: #00ffcc; color: #0f0f1a; border: none; border-radius: 5px; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
-        .btn:hover { background: #fff; transform: scale(1.05); }
-        #controles-dica { margin-top: 15px; font-size: 0.9rem; color: #888; }
+        body { background: #111; color: #fff; text-align: center; font-family: sans-serif; }
+        canvas { background: #000; border: 3px solid #fff; display: block; margin: 20px auto; }
     </style>
 </head>
 <body>
 
-    <h1>Snake Arcade</h1>
-
-    <div id="placar-container">
-        <div>Pontos: <span id="score" style="color:#00ffcc">0</span></div>
-        <div>Recorde: <span id="highscore" style="color:#ff007f">0</span></div>
-    </div>
-
-    <div id="canvas-container">
-        <canvas id="gameCanvas" width="400" height="400"></canvas>
-        <div id="tela-over" class="ativo">
-            <h2 id="titulo-tela">Iniciar Jogo</h2>
-            <button class="btn" onclick="iniciarJogo()">Jogar</button>
-        </div>
-    </div>
-
-    <div id="controles-dica">Use as Setas do teclado ou W, A, S, D para se movimentar.</div>
+    <h1>Pontos: <span id="score">0</span></h1>
+    <canvas id="game" width="400" height="400"></canvas>
 
     <script>
-        const canvas = document.getElementById("gameCanvas");
+        const canvas = document.getElementById("game");
         const ctx = canvas.getContext("2d");
-        const scoreElement = document.getElementById("score");
-        const highscoreElement = document.getElementById("highscore");
-        const telaOver = document.getElementById("tela-over");
-        const tituloTela = document.getElementById("titulo-tela");
-
-        const tamBloco = 20, tamCampo = canvas.width / tamBloco;
-        let cobra, comida, dx, dy, pontuacao, loopJogo;
-        let recorde = localStorage.getItem("snake_highscore") || 0;
-        highscoreElement.innerText = recorde;
+        const tam = 20, limite = 20;
+        
+        let cobra = [{x: 10, y: 10}];
+        let comida = {x: 15, y: 15};
+        let dx = 1, dy = 0, pontos = 0;
 
         window.addEventListener("keydown", e => {
-            const t = e.key.toLowerCase();
-            if ((t === "arrowleft" || t === "a") && dx === 0) { dx = -1; dy = 0; }
-            if ((t === "arrowup" || t === "w") && dy === 0) { dx = 0; dy = -1; }
-            if ((t === "arrowright" || t === "d") && dx === 0) { dx = 1; dy = 0; }
-            if ((t === "arrowdown" || t === "s") && dy === 0) { dx = 0; dy = 1; }
+            if (e.key === "ArrowLeft" && dx === 0) { dx = -1; dy = 0; }
+            if (e.key === "ArrowUp" && dy === 0) { dx = 0; dy = -1; }
+            if (e.key === "ArrowRight" && dx === 0) { dx = 1; dy = 0; }
+            if (e.key === "ArrowDown" && dy === 0) { dx = 0; dy = 1; }
         });
 
-        function iniciarJogo() {
-            cobra = [{x: 10, y: 10}, {x: 9, y: 10}, {x: 8, y: 10}];
-            dx = 1; dy = 0; pontuacao = 0;
-            scoreElement.innerText = 0;
-            gerarComida();
-            telaOver.classList.remove("ativo");
-            clearInterval(loopJogo);
-            loopJogo = setInterval(atualizar, 100);
-        }
+        function jogo() {
+            let cabeca = { x: cobra[0].x + dx, y: cobra[0].y + dy };
 
-        function atualizar() {
-            const cabeca = { x: cobra[0].x + dx, y: cobra[0].y + dy };
-            cobra.unshift(cabeca);
-
-            if (cabeca.x < 0 || cabeca.x >= tamCampo || cabeca.y < 0 || cabeca.y >= tamCampo || cobra.slice(1).some(p => p.x === cabeca.x && p.y === cabeca.y)) {
-                clearInterval(loopJogo);
-                if (pontuacao > recorde) {
-                    recorde = pontuacao;
-                    localStorage.setItem("snake_highscore", recorde);
-                    highscoreElement.innerText = recorde;
-                }
-                tituloTela.innerText = "Game Over";
-                telaOver.classList.add("ativo");
+            if (cabeca.x < 0 || cabeca.x >= limite || cabeca.y < 0 || cabeca.y >= limite || cobra.some(p => p.x === cabeca.x && p.y === cabeca.y)) {
+                cobra = [{x: 10, y: 10}];
+                dx = 1; dy = 0; pontos = 0;
+                document.getElementById("score").innerText = pontos;
                 return;
             }
 
+            cobra.unshift(cabeca);
+
             if (cabeca.x === comida.x && cabeca.y === comida.y) {
-                pontuacao += 10;
-                scoreElement.innerText = pontuacao;
-                gerarComida();
+                pontos++;
+                document.getElementById("score").innerText = pontos;
+                comida = { x: Math.floor(Math.random() * limite), y: Math.floor(Math.random() * limite) };
             } else {
                 cobra.pop();
             }
 
-            ctx.fillStyle = "#05050a";
+            ctx.fillStyle = "#000";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = "#ff0055";
-            ctx.fillRect(comida.x * tamBloco + 1, comida.y * tamBloco + 1, tamBloco - 2, tamBloco - 2);
-            cobra.forEach((p, i) => {
-                ctx.fillStyle = i === 0 ? "#00ffcc" : "#00b399";
-                ctx.fillRect(p.x * tamBloco + 1, p.y * tamBloco + 1, tamBloco - 2, tamBloco - 2);
-            });
+
+            ctx.fillStyle = "red";
+            ctx.fillRect(comida.x * tam, comida.y * tam, tam - 2, tam - 2);
+
+            ctx.fillStyle = "lime";
+            cobra.forEach(p => ctx.fillRect(p.x * tam, p.y * tam, tam - 2, tam - 2));
         }
 
-        function gerarComida() {
-            comida = { x: Math.floor(Math.random() * tamCampo), y: Math.floor(Math.random() * tamCampo) };
-            if (cobra.some(p => p.x === comida.x && p.y === comida.y)) gerarComida();
-        }
+        setInterval(jogo, 100);
     </script>
 </body>
 </html>
