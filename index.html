@@ -75,7 +75,6 @@
         let keys = {};
         let particles = [];
 
-        // Captura de Teclado corrigida para não dar conflito entre maiúsculas/minúsculas
         document.addEventListener("keydown", e => {
             keys[e.key.toLowerCase()] = true;
             keys[e.key] = true; 
@@ -154,11 +153,9 @@
         }
 
         function loop() {
-            // Fundo com efeito de rastro
             ctx.fillStyle = "rgba(5, 5, 10, 0.25)";
             ctx.fillRect(0, 0, 800, 500);
 
-            // Linha Central
             ctx.strokeStyle = "rgba(255, 255, 255, 0.05)";
             ctx.lineWidth = 2;
             ctx.setLineDash([10, 10]);
@@ -169,38 +166,32 @@
             ctx.setLineDash([]); 
 
             if (gameState === 'PLAYING') {
-                // CORREÇÃO: Movimentação puramente manual para ambos os jogadores
                 if (keys["w"]) p1Y = Math.max(10, p1Y - 7);
                 if (keys["s"]) p1Y = Math.min(390, p1Y + 7);
                 
                 if (keys["ArrowUp"]) p2Y = Math.max(10, p2Y - 7);
                 if (keys["ArrowDown"]) p2Y = Math.min(390, p2Y + 7);
 
-                // Movimento da Bola
                 bX += bDX; 
                 bY += bDY;
 
-                // Colisão com teto e chão
                 if (bY < 12 || bY > 488) {
                     bDY = -bDY;
                     createExplosion(bX, bY, "#ffffff");
                 }
 
-                // Colisão: Raquete Jogador 1 (Tratada para evitar bugs de colisão traseira)
                 if (bDX < 0 && bX < 26 && bX > 10 && bY > p1Y && bY < p1Y + 100) {
-                    bDX = Math.abs(bDX) * 1.05; // Garante que a bola vá para a direita
+                    bDX = Math.abs(bDX) * 1.05; 
                     bDY = (bY - (p1Y + 50)) * 0.2;
                     createExplosion(bX, bY, "#00ffcc");
                 }
                 
-                // Colisão: Raquete Jogador 2
                 if (bDX > 0 && bX > 774 && bX < 790 && bY > p2Y && bY < p2Y + 100) {
-                    bDX = -Math.abs(bDX) * 1.05; // Garante que a bola vá para a esquerda
+                    bDX = -Math.abs(bDX) * 1.05; 
                     bDY = (bY - (p2Y + 50)) * 0.2;
                     createExplosion(bX, bY, "#ff0055");
                 }
 
-                // Pontuação
                 if (bX < 0) { 
                     p2Score++; 
                     p2S.innerText = p2Score; 
@@ -219,7 +210,6 @@
                 updateParticles();
                 drawParticles();
 
-                // Desenho da Bola
                 ctx.save();
                 ctx.fillStyle = "#fff";
                 ctx.shadowBlur = 15;
@@ -228,7 +218,6 @@
                 ctx.restore();
 
             } else {
-                // Telas de Menu / Game Over
                 ctx.fillStyle = "rgba(0,0,0,0.6)";
                 ctx.fillRect(0, 0, 800, 500);
                 
@@ -250,8 +239,6 @@
                 }
             }
 
-            // Renderização das Raquetes
-            // Raquete 1 (Esquerda)
             ctx.save();
             ctx.fillStyle = "#00ffcc";
             ctx.shadowBlur = 15;
@@ -259,7 +246,6 @@
             ctx.fillRect(12, p1Y, 12, 100);
             ctx.restore();
 
-            // Raquete 2 (Direita)
             ctx.save();
             ctx.fillStyle = "#ff0055";
             ctx.shadowBlur = 15;
@@ -272,4 +258,4 @@
         loop();
     </script>
 </body>
-</html> 
+</html>
