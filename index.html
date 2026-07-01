@@ -2,93 +2,274 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Pong Premium</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pong Cyberpunk Edition</title>
     <style>
         body { 
-            background: #0a0a12; 
+            background: #05050a; 
             color: #fff; 
-            font-family: sans-serif; 
-            text-align: center; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
             margin: 0; 
             overflow: hidden; 
         }
+        .ui-container {
+            display: flex;
+            justify-content: space-between;
+            width: 800px;
+            margin-bottom: 10px;
+        }
+        .score-board { 
+            font-size: 40px; 
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(255,255,255,0.2);
+        }
         canvas { 
-            border: 4px solid #334; 
+            border: 3px solid #1f1f38; 
             background: #000; 
-            margin-top: 20px; 
-            box-shadow: 0 0 20px rgba(0,254,255,0.1); 
+            box-shadow: 0 0 30px rgba(0, 254, 255, 0.15); 
+            border-radius: 4px;
         }
-        h2 { 
-            font-size: 32px; 
-            margin: 15px 0 0 0; 
-            letter-spacing: 4px; 
+        .controls {
+            color: #555577;
+            margin-top: 15px;
+            font-size: 14px;
+            display: flex;
+            gap: 40px;
         }
+        .highlight { font-weight: bold; }
     </style>
 </head>
 <body>
-    <h2><span id="p1" style="color:#00ffcc">0</span> : <span id="p2" style="color:#ff0055">0</span></h2>
+
+    <div class="ui-container">
+        <div class="score-board" style="color:#00ffcc" id="p1-display">0</div>
+        <div class="score-board" style="color:#fff; font-size: 24px; align-self: center;">VS</div>
+        <div class="score-board" style="color:#ff0055" id="p2-display">0</div>
+    </div>
+
     <canvas id="c" width="800" height="500"></canvas>
-    <p style="color:#667">Controle: Setas ↑ e ↓</p>
+
+    <div class="controls">
+        <p><span class="highlight" style="color:#00ffcc">Jogador 1:</span> W (Subir) | S (Descer)</p>
+        <p><span class="highlight" style="color:#ff0055">Jogador 2:</span> Seta ↑ | Seta ↓</p>
+    </div>
 
     <script>
         const canvas = document.getElementById("c");
         const ctx = canvas.getContext("2d");
-        const p1S = document.getElementById("p1");
-        const p2S = document.getElementById("p2");
+        const p1S = document.getElementById("p1-display");
+        const p2S = document.getElementById("p2-display");
         
+        let gameState = 'MENU';
+        let winner = '';
+
+        const WIN_SCORE = 5;
         let p1Y = 200, p2Y = 200, p1Score = 0, p2Score = 0;
-        let bX = 400, bY = 250, bDX = 5, bDY = 3;
+        let bX = 400, bY = 250, bDX = 6, bDY = 3;
         let keys = {};
+        let particles = [];
 
-        document.addEventListener("keydown", e => keys[e.key] = true);
-        document.addEventListener("keyup", e => keys[e.key] = false);
+        // Captura de Teclado corrigida para não dar conflito entre maiúsculas/minúsculas
+        document.addEventListener("keydown", e => {
+            keys[e.key.toLowerCase()] = true;
+            keys[e.key] = true; 
+            
+            if (gameState !== 'PLAYING' && e.key === ' ') {
+                resetGame();
+                gameState = 'PLAYING';
+            }
+        });
+        document.addEventListener("keyup", e => {
+            keys[e.key.toLowerCase()] = false;
+            keys[e.key] = false;
+        });
 
-        function reset() { 
+        function createExplosion(x, y, color) {
+            for (let i = 0; i < 12; i++) {
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: (Math.random() - 0.5) * 8,
+                    vy: (Math.random() - 0.5) * 8,
+                    alpha: 1,
+                    color: color,
+                    size: Math.random() * 3 + 1
+                });
+            }
+        }
+
+        function updateParticles() {
+            for (let i = particles.length - 1; i >= 0; i--) {
+                let p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.alpha -= 0.02;
+                if (p.alpha <= 0) particles.splice(i, 1);
+            }
+        }
+
+        function drawParticles() {
+            particles.forEach(p => {
+                ctx.save();
+                ctx.globalAlpha = p.alpha;
+                ctx.fillStyle = p.color;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = p.color;
+                ctx.fillRect(p.x, p.y, p.size, p.size);
+                ctx.restore();
+            });
+        }
+
+        function resetBall(direction) { 
             bX = 400; 
             bY = 250; 
-            bDX = bDX > 0 ? -5 : 5; 
+            bDX = direction * 6; 
             bDY = (Math.random() - 0.5) * 6; 
         }
 
+        function resetGame() {
+            p1Score = 0;
+            p2Score = 0;
+            p1S.innerText = '0';
+            p2S.innerText = '0';
+            p1Y = 200;
+            p2Y = 200;
+            resetBall(Math.random() > 0.5 ? 1 : -1);
+        }
+
+        function checkGameOver() {
+            if (p1Score >= WIN_SCORE) {
+                winner = 'JOGADOR 1';
+                gameState = 'GAMEOVER';
+            } else if (p2Score >= WIN_SCORE) {
+                winner = 'JOGADOR 2';
+                gameState = 'GAMEOVER';
+            }
+        }
+
         function loop() {
-            if (keys["ArrowUp"]) p1Y = Math.max(0, p1Y - 7);
-            if (keys["ArrowDown"]) p1Y = Math.min(400, p1Y + 7);
-            
-            p2Y += (bY - 50 - p2Y) * 0.12;
-            p2Y = Math.max(0, Math.min(400, p2Y));
-
-            bX += bDX; 
-            bY += bDY;
-
-            if (bY < 10 || bY > 490) bDY = -bDY;
-
-            if (bDX < 0 && bX < 25 && bY > p1Y && bY < p1Y + 100) {
-                bDX = -bDX * 1.05;
-                bDY = (bY - (p1Y + 50)) * 0.15;
-            }
-            if (bDX > 0 && bX > 775 && bY > p2Y && bY < p2Y + 100) {
-                bDX = -bDX * 1.05;
-                bDY = (bY - (p2Y + 50)) * 0.15;
-            }
-
-            if (bX < 0) { p2Score++; p2S.innerText = p2Score; reset(); }
-            if (bX > 800) { p1Score++; p1S.innerText = p1Score; reset(); }
-
-            ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
+            // Fundo com efeito de rastro
+            ctx.fillStyle = "rgba(5, 5, 10, 0.25)";
             ctx.fillRect(0, 0, 800, 500);
 
+            // Linha Central
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.05)";
+            ctx.lineWidth = 2;
+            ctx.setLineDash([10, 10]);
+            ctx.beginPath();
+            ctx.moveTo(400, 0);
+            ctx.lineTo(400, 500);
+            ctx.stroke();
+            ctx.setLineDash([]); 
+
+            if (gameState === 'PLAYING') {
+                // CORREÇÃO: Movimentação puramente manual para ambos os jogadores
+                if (keys["w"]) p1Y = Math.max(10, p1Y - 7);
+                if (keys["s"]) p1Y = Math.min(390, p1Y + 7);
+                
+                if (keys["ArrowUp"]) p2Y = Math.max(10, p2Y - 7);
+                if (keys["ArrowDown"]) p2Y = Math.min(390, p2Y + 7);
+
+                // Movimento da Bola
+                bX += bDX; 
+                bY += bDY;
+
+                // Colisão com teto e chão
+                if (bY < 12 || bY > 488) {
+                    bDY = -bDY;
+                    createExplosion(bX, bY, "#ffffff");
+                }
+
+                // Colisão: Raquete Jogador 1 (Tratada para evitar bugs de colisão traseira)
+                if (bDX < 0 && bX < 26 && bX > 10 && bY > p1Y && bY < p1Y + 100) {
+                    bDX = Math.abs(bDX) * 1.05; // Garante que a bola vá para a direita
+                    bDY = (bY - (p1Y + 50)) * 0.2;
+                    createExplosion(bX, bY, "#00ffcc");
+                }
+                
+                // Colisão: Raquete Jogador 2
+                if (bDX > 0 && bX > 774 && bX < 790 && bY > p2Y && bY < p2Y + 100) {
+                    bDX = -Math.abs(bDX) * 1.05; // Garante que a bola vá para a esquerda
+                    bDY = (bY - (p2Y + 50)) * 0.2;
+                    createExplosion(bX, bY, "#ff0055");
+                }
+
+                // Pontuação
+                if (bX < 0) { 
+                    p2Score++; 
+                    p2S.innerText = p2Score; 
+                    createExplosion(30, bY, "#ff0055");
+                    checkGameOver();
+                    if(gameState === 'PLAYING') resetBall(1); 
+                }
+                if (bX > 800) { 
+                    p1Score++; 
+                    p1S.innerText = p1Score; 
+                    createExplosion(770, bY, "#00ffcc");
+                    checkGameOver();
+                    if(gameState === 'PLAYING') resetBall(-1); 
+                }
+
+                updateParticles();
+                drawParticles();
+
+                // Desenho da Bola
+                ctx.save();
+                ctx.fillStyle = "#fff";
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = "#fff";
+                ctx.fillRect(bX - 6, bY - 6, 12, 12);
+                ctx.restore();
+
+            } else {
+                // Telas de Menu / Game Over
+                ctx.fillStyle = "rgba(0,0,0,0.6)";
+                ctx.fillRect(0, 0, 800, 500);
+                
+                ctx.textAlign = "center";
+                ctx.font = "bold 28px 'Segoe UI'";
+                
+                if (gameState === 'MENU') {
+                    ctx.fillStyle = "#00ffcc";
+                    ctx.fillText("PONG CYBERPUNK", 400, 220);
+                    ctx.fillStyle = "#fff";
+                    ctx.font = "18px 'Segoe UI'";
+                    ctx.fillText("Pressione ESPAÇO para Iniciar", 400, 280);
+                } else if (gameState === 'GAMEOVER') {
+                    ctx.fillStyle = winner === 'JOGADOR 1' ? "#00ffcc" : "#ff0055";
+                    ctx.fillText(`${winner} VENCEU!`, 400, 220);
+                    ctx.fillStyle = "#fff";
+                    ctx.font = "18px 'Segoe UI'";
+                    ctx.fillText("Pressione ESPAÇO para Jogar Novamente", 400, 280);
+                }
+            }
+
+            // Renderização das Raquetes
+            // Raquete 1 (Esquerda)
+            ctx.save();
             ctx.fillStyle = "#00ffcc";
-            ctx.fillRect(10, p1Y, 10, 100);
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = "#00ffcc";
+            ctx.fillRect(12, p1Y, 12, 100);
+            ctx.restore();
 
+            // Raquete 2 (Direita)
+            ctx.save();
             ctx.fillStyle = "#ff0055";
-            ctx.fillRect(780, p2Y, 10, 100);
-
-            ctx.fillStyle = "#fff";
-            ctx.fillRect(bX - 6, bY - 6, 12, 12);
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = "#ff0055";
+            ctx.fillRect(776, p2Y, 12, 100);
+            ctx.restore();
 
             requestAnimationFrame(loop);
         }
         loop();
     </script>
 </body>
-</html>
+</html> 
