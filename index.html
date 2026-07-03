@@ -85,22 +85,22 @@
         let winner = '';
         const WIN_SCORE = 5;
 
-        // Configuração Jogadores
+        
         let p1 = { x: 15, y: 200, w: 12, h: 90, score: 0, color: '#00f0ff' };
         let p2 = { x: 773, y: 200, w: 12, h: 90, score: 0, color: '#ff007f' };
         
-        // Configuração Bola e Trilha
+       
         let ball = { x: 400, y: 250, r: 7, dx: 7, dy: 4, speedMultiplier: 1 };
-        let ballHistory = []; // Para o efeito de rastro
+        let ballHistory = []; 
         
-        // Power-Up System
+        
         let powerUp = { x: 0, y: 0, w: 20, h: 20, active: false, type: 'BOOST', timer: 0 };
         const powerUpTypes = ['BIGGER', 'SPEEDY'];
 
         let keys = {};
         let particles = [];
 
-        // Input Listeners
+      
         document.addEventListener("keydown", e => {
             keys[e.key] = true;
             if (gameState !== 'PLAYING' && e.key === ' ') {
@@ -140,7 +140,7 @@
             p1.h = 90;
             p2.h = 90;
             
-            // 30% de chance de spawnar um power-up no round
+            
             if(Math.random() < 0.4) spawnPowerUp(); else powerUp.active = false;
         }
 
@@ -159,42 +159,42 @@
         function update() {
             if (gameState !== 'PLAYING') return;
 
-            // Movimentação P1 (W / S)
+            
             if (keys["w"] || keys["W"]) p1.y = Math.max(10, p1.y - 8);
             if (keys["s"] || keys["S"]) p1.y = Math.min(500 - p1.h - 10, p1.y + 8);
             
-            // Movimentação P2 (Setas)
+            
             if (keys["ArrowUp"]) p2.y = Math.max(10, p2.y - 8);
             if (keys["ArrowDown"]) p2.y = Math.min(500 - p2.h - 10, p2.y + 8);
 
-            // Histórico da bola (Trilha)
+            
             ballHistory.push({x: ball.x, y: ball.y});
             if (ballHistory.length > 8) ballHistory.shift();
 
-            // Mover Bola
+            
             ball.x += ball.dx * ball.speedMultiplier;
             ball.y += ball.dy * ball.speedMultiplier;
 
-            // Colisão Teto/Chão
+           
             if (ball.y - ball.r < 0 || ball.y + ball.r > 500) {
                 ball.dy = -ball.dy;
                 createExplosion(ball.x, ball.y, "#ffffff");
             }
 
-            // Colisão Power-up
+            
             if (powerUp.active && 
                 ball.x > powerUp.x && ball.x < powerUp.x + powerUp.w &&
                 ball.y > powerUp.y && ball.y < powerUp.y + powerUp.h) {
                 
                 powerUp.active = false;
-                let hitter = ball.dx > 0 ? p1 : p2; // Quem rebateu por último ganha
+                let hitter = ball.dx > 0 ? p1 : p2; 
                 createExplosion(powerUp.x + 10, powerUp.y + 10, '#9d00ff');
 
                 if (powerUp.type === 'BIGGER') hitter.h = 140;
                 if (powerUp.type === 'SPEEDY') ball.speedMultiplier = 1.5;
             }
 
-            // Colisão Paddle 1 (Esquerda)
+           
             if (ball.dx < 0 && ball.x - ball.r <= p1.x + p1.w && ball.x + ball.r >= p1.x) {
                 if (ball.y >= p1.y && ball.y <= p1.y + p1.h) {
                     let relativeIntersectY = (p1.y + (p1.h/2)) - ball.y;
@@ -205,7 +205,6 @@
                 }
             }
 
-            // Colisão Paddle 2 (Direita)
             if (ball.dx > 0 && ball.x + ball.r >= p2.x && ball.x - ball.r <= p2.x + p2.w) {
                 if (ball.y >= p2.y && ball.y <= p2.y + p2.h) {
                     let relativeIntersectY = (p2.y + (p2.h/2)) - ball.y;
@@ -216,7 +215,7 @@
                 }
             }
 
-            // Pontuação
+           
             if (ball.x < 0) {
                 p2.score++; p2S.innerText = p2.score;
                 createExplosion(p1.x, ball.y, p2.color);
@@ -229,7 +228,7 @@
                 if(gameState === 'PLAYING') resetBall(-1);
             }
 
-            // Atualizar Partículas
+            
             for (let i = particles.length - 1; i >= 0; i--) {
                 let p = particles[i];
                 p.x += p.vx; p.y += p.vy; p.alpha -= 0.025;
@@ -238,25 +237,25 @@
         }
 
         function draw() {
-            // Fundo com rastro preto semitransparente
+            
             ctx.fillStyle = "rgba(3, 3, 8, 0.3)";
             ctx.fillRect(0, 0, 800, 500);
 
-            // Linha Central Estilizada
+            
             ctx.strokeStyle = "rgba(157, 0, 255, 0.15)";
             ctx.lineWidth = 4;
             ctx.setLineDash([15, 15]);
             ctx.strokeRect(398, 0, 4, 500);
             ctx.setLineDash([]);
 
-            // Desenhar Partículas
+            
             particles.forEach(p => {
                 ctx.save(); ctx.globalAlpha = p.alpha; ctx.fillStyle = p.color;
                 ctx.fillRect(p.x, p.y, p.size, p.size); ctx.restore();
             });
 
             if (gameState === 'PLAYING') {
-                // Desenhar Trilha da Bola
+                
                 ballHistory.forEach((pos, index) => {
                     ctx.save();
                     ctx.globalAlpha = (index / ballHistory.length) * 0.4;
@@ -267,7 +266,7 @@
                     ctx.restore();
                 });
 
-                // Desenhar Bola Principal
+                
                 ctx.save();
                 ctx.fillStyle = "#fff";
                 ctx.shadowBlur = 15; ctx.shadowColor = "#fff";
@@ -276,7 +275,7 @@
                 ctx.fill();
                 ctx.restore();
 
-                // Desenhar Power-Up se ativo
+                
                 if (powerUp.active) {
                     ctx.save();
                     ctx.fillStyle = '#9d00ff';
@@ -288,7 +287,7 @@
                     ctx.restore();
                 }
             } else {
-                // Telas de Menu / Game Over Overlay
+               
                 ctx.fillStyle = "rgba(0,0,0,0.75)";
                 ctx.fillRect(0, 0, 800, 500);
                 ctx.textAlign = "center";
@@ -307,13 +306,13 @@
                 }
             }
 
-            // Desenhar Jogador 1 (Neon Blue)
+            
             ctx.save();
             ctx.fillStyle = p1.color; ctx.shadowBlur = 15; ctx.shadowColor = p1.color;
             ctx.fillRect(p1.x, p1.y, p1.w, p1.h);
             ctx.restore();
 
-            // Desenhar Jogador 2 (Neon Pink)
+            
             ctx.save();
             ctx.fillStyle = p2.color; ctx.shadowBlur = 15; ctx.shadowColor = p2.color;
             ctx.fillRect(p2.x, p2.y, p2.w, p2.h);
