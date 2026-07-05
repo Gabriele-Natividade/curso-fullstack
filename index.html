@@ -3,328 +3,162 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pong Cyberpunk - Ultra Edition</title>
+    <title>Jogo da Cobrinha</title>
     <style>
-        :root {
-            --neon-blue: #00f0ff;
-            --neon-pink: #ff007f;
-            --neon-purple: #9d00ff;
-            --bg-dark: #030308;
-        }
-        body { 
-            background: var(--bg-dark); 
-            color: #fff; 
-            font-family: 'Courier New', Courier, monospace; 
+        body {
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0; 
-            overflow: hidden; 
+            background-color: #2c3e50;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin-top: 50px;
         }
-        .ui-container {
-            display: flex;
-            justify-content: space-between;
-            width: 800px;
-            margin-bottom: 15px;
-            border-bottom: 2px dashed rgba(255,255,255,0.1);
-            padding-bottom: 10px;
+        canvas {
+            background-color: #34495e;
+            border: 3px solid #ecf0f1;
+            border-radius: 5px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
         }
-        .score-board { 
-            font-size: 48px; 
+        #pontuacao {
+            font-size: 24px;
             font-weight: bold;
-            letter-spacing: 4px;
-            font-family: sans-serif;
+            margin-bottom: 15px;
+            color: #f1c40f;
         }
-        .score-p1 { text-shadow: 0 0 15px var(--neon-blue); color: var(--neon-blue); }
-        .score-p2 { text-shadow: 0 0 15px var(--neon-pink); color: var(--neon-pink); }
-        .vs-sign { color: #555; font-size: 20px; align-self: center; letter-spacing: 6px; }
-        
-        canvas { 
-            border: 4px solid #111122; 
-            background: #000; 
-            box-shadow: 0 0 40px rgba(157, 0, 255, 0.2); 
-            border-radius: 8px;
-        }
-        .controls {
-            color: #666dec;
+        p {
+            color: #bdc3c7;
             margin-top: 15px;
-            font-size: 13px;
-            display: flex;
-            gap: 50px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
         }
-        .highlight { font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div class="ui-container">
-        <div class="score-board score-p1" id="p1-display">0</div>
-        <div class="vs-sign">NEON_MATCH</div>
-        <div class="score-board score-p2" id="p2-display">0</div>
-    </div>
-
-    <canvas id="gameCanvas" width="800" height="500"></canvas>
-
-    <div class="controls">
-        <p><span class="highlight" style="color:var(--neon-blue)">P1:</span> W / S</p>
-        <p><span style="color:var(--neon-purple)">🔥 POWER-UPS ATIVOS</span></p>
-        <p><span class="highlight" style="color:var(--neon-pink)">P2:</span> Seta ↑ / ↓</p>
-    </div>
+    <h1>🐍 Jogo da Cobrinha</h1>
+    <div id="pontuacao">Pontuação: 0</div>
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+    <p>Use as <b>setas do teclado</b> para jogar.</p>
 
     <script>
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
-        const p1S = document.getElementById("p1-display");
-        const p2S = document.getElementById("p2-display");
-        
-        let gameState = 'MENU'; // MENU, PLAYING, GAMEOVER
-        let winner = '';
-        const WIN_SCORE = 5;
 
-        
-        let p1 = { x: 15, y: 200, w: 12, h: 90, score: 0, color: '#00f0ff' };
-        let p2 = { x: 773, y: 200, w: 12, h: 90, score: 0, color: '#ff007f' };
-        
-       
-        let ball = { x: 400, y: 250, r: 7, dx: 7, dy: 4, speedMultiplier: 1 };
-        let ballHistory = []; 
-        
-        
-        let powerUp = { x: 0, y: 0, w: 20, h: 20, active: false, type: 'BOOST', timer: 0 };
-        const powerUpTypes = ['BIGGER', 'SPEEDY'];
+        const tamanhoGrid = 20;
+        let cobrinha = [{ x: 160, y: 160 }];
+        let dx = tamanhoGrid;
+        let dy = 0;
+        let comidaX;
+        let comidaY;
+        let pontuacao = 0;
+        let jogoRodando = true;
 
-        let keys = {};
-        let particles = [];
-
-      
-        document.addEventListener("keydown", e => {
-            keys[e.key] = true;
-            if (gameState !== 'PLAYING' && e.key === ' ') {
-                resetGame();
-                gameState = 'PLAYING';
-            }
-        });
-        document.addEventListener("keyup", e => keys[e.key] = false);
-
-        function spawnPowerUp() {
-            powerUp.x = 200 + Math.random() * 400;
-            powerUp.y = 100 + Math.random() * 300;
-            powerUp.type = powerUpTypes[Math.floor(Math.random() * powerUpTypes.length)];
-            powerUp.active = true;
+        function gerarComida() {
+            comidaX = Math.floor(Math.random() * (canvas.width / tamanhoGrid)) * tamanhoGrid;
+            comidaY = Math.floor(Math.random() * (canvas.height / tamanhoGrid)) * tamanhoGrid;
         }
 
-        function createExplosion(x, y, color) {
-            for (let i = 0; i < 20; i++) {
-                particles.push({
-                    x, y,
-                    vx: (Math.random() - 0.5) * 10,
-                    vy: (Math.random() - 0.5) * 10,
-                    alpha: 1,
-                    color: color,
-                    size: Math.random() * 4 + 1
-                });
-            }
+        function desenharComida() {
+            ctx.fillStyle = "#e74c3c"; // Cor da maçã
+            ctx.beginPath();
+            ctx.arc(comidaX + tamanhoGrid/2, comidaY + tamanhoGrid/2, tamanhoGrid/2.5, 0, 2 * Math.PI);
+            ctx.fill();
         }
 
-        function resetBall(dir) { 
-            ball.x = 400; 
-            ball.y = 250; 
-            ball.dx = dir * 7; 
-            ball.dy = (Math.random() - 0.5) * 8; 
-            ball.speedMultiplier = 1;
-            ballHistory = [];
-            p1.h = 90;
-            p2.h = 90;
-            
-            
-            if(Math.random() < 0.4) spawnPowerUp(); else powerUp.active = false;
-        }
-
-        function resetGame() {
-            p1.score = 0; p2.score = 0;
-            p1S.innerText = '0'; p2S.innerText = '0';
-            p1.y = 200; p2.y = 200;
-            resetBall(Math.random() > 0.5 ? 1 : -1);
-        }
-
-        function checkGameOver() {
-            if (p1.score >= WIN_SCORE) { winner = 'JOGADOR 1'; gameState = 'GAMEOVER'; }
-            else if (p2.score >= WIN_SCORE) { winner = 'JOGADOR 2'; gameState = 'GAMEOVER'; }
-        }
-
-        function update() {
-            if (gameState !== 'PLAYING') return;
-
-            
-            if (keys["w"] || keys["W"]) p1.y = Math.max(10, p1.y - 8);
-            if (keys["s"] || keys["S"]) p1.y = Math.min(500 - p1.h - 10, p1.y + 8);
-            
-            
-            if (keys["ArrowUp"]) p2.y = Math.max(10, p2.y - 8);
-            if (keys["ArrowDown"]) p2.y = Math.min(500 - p2.h - 10, p2.y + 8);
-
-            
-            ballHistory.push({x: ball.x, y: ball.y});
-            if (ballHistory.length > 8) ballHistory.shift();
-
-            
-            ball.x += ball.dx * ball.speedMultiplier;
-            ball.y += ball.dy * ball.speedMultiplier;
-
-           
-            if (ball.y - ball.r < 0 || ball.y + ball.r > 500) {
-                ball.dy = -ball.dy;
-                createExplosion(ball.x, ball.y, "#ffffff");
-            }
-
-            
-            if (powerUp.active && 
-                ball.x > powerUp.x && ball.x < powerUp.x + powerUp.w &&
-                ball.y > powerUp.y && ball.y < powerUp.y + powerUp.h) {
-                
-                powerUp.active = false;
-                let hitter = ball.dx > 0 ? p1 : p2; 
-                createExplosion(powerUp.x + 10, powerUp.y + 10, '#9d00ff');
-
-                if (powerUp.type === 'BIGGER') hitter.h = 140;
-                if (powerUp.type === 'SPEEDY') ball.speedMultiplier = 1.5;
-            }
-
-           
-            if (ball.dx < 0 && ball.x - ball.r <= p1.x + p1.w && ball.x + ball.r >= p1.x) {
-                if (ball.y >= p1.y && ball.y <= p1.y + p1.h) {
-                    let relativeIntersectY = (p1.y + (p1.h/2)) - ball.y;
-                    let bounceAngle = relativeIntersectY / (p1.h/2);
-                    ball.dx = Math.abs(ball.dx) * 1.04;
-                    ball.dy = -bounceAngle * 6;
-                    createExplosion(ball.x, ball.y, p1.color);
-                }
-            }
-
-            if (ball.dx > 0 && ball.x + ball.r >= p2.x && ball.x - ball.r <= p2.x + p2.w) {
-                if (ball.y >= p2.y && ball.y <= p2.y + p2.h) {
-                    let relativeIntersectY = (p2.y + (p2.h/2)) - ball.y;
-                    let bounceAngle = relativeIntersectY / (p2.h/2);
-                    ball.dx = -Math.abs(ball.dx) * 1.04;
-                    ball.dy = -bounceAngle * 6;
-                    createExplosion(ball.x, ball.y, p2.color);
-                }
-            }
-
-           
-            if (ball.x < 0) {
-                p2.score++; p2S.innerText = p2.score;
-                createExplosion(p1.x, ball.y, p2.color);
-                checkGameOver();
-                if(gameState === 'PLAYING') resetBall(1);
-            } else if (ball.x > 800) {
-                p1.score++; p1S.innerText = p1.score;
-                createExplosion(p2.x, ball.y, p1.color);
-                checkGameOver();
-                if(gameState === 'PLAYING') resetBall(-1);
-            }
-
-            
-            for (let i = particles.length - 1; i >= 0; i--) {
-                let p = particles[i];
-                p.x += p.vx; p.y += p.vy; p.alpha -= 0.025;
-                if (p.alpha <= 0) particles.splice(i, 1);
-            }
-        }
-
-        function draw() {
-            
-            ctx.fillStyle = "rgba(3, 3, 8, 0.3)";
-            ctx.fillRect(0, 0, 800, 500);
-
-            
-            ctx.strokeStyle = "rgba(157, 0, 255, 0.15)";
-            ctx.lineWidth = 4;
-            ctx.setLineDash([15, 15]);
-            ctx.strokeRect(398, 0, 4, 500);
-            ctx.setLineDash([]);
-
-            
-            particles.forEach(p => {
-                ctx.save(); ctx.globalAlpha = p.alpha; ctx.fillStyle = p.color;
-                ctx.fillRect(p.x, p.y, p.size, p.size); ctx.restore();
+        function desenharCobrinha() {
+            ctx.fillStyle = "#2ecc71"; // Cor da cobra
+            ctx.strokeStyle = "#27ae60"; // Borda da cobra
+            cobrinha.forEach(parte => {
+                ctx.fillRect(parte.x, parte.y, tamanhoGrid, tamanhoGrid);
+                ctx.strokeRect(parte.x, parte.y, tamanhoGrid, tamanhoGrid);
             });
+        }
 
-            if (gameState === 'PLAYING') {
-                
-                ballHistory.forEach((pos, index) => {
-                    ctx.save();
-                    ctx.globalAlpha = (index / ballHistory.length) * 0.4;
-                    ctx.fillStyle = '#9d00ff';
-                    ctx.beginPath();
-                    ctx.arc(pos.x, pos.y, ball.r * (index / ballHistory.length), 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.restore();
-                });
+        function moverCobrinha() {
+            const cabeca = { x: cobrinha[0].x + dx, y: cobrinha[0].y + dy };
+            cobrinha.unshift(cabeca); // Adiciona nova cabeça
 
-                
-                ctx.save();
-                ctx.fillStyle = "#fff";
-                ctx.shadowBlur = 15; ctx.shadowColor = "#fff";
-                ctx.beginPath();
-                ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.restore();
-
-                
-                if (powerUp.active) {
-                    ctx.save();
-                    ctx.fillStyle = '#9d00ff';
-                    ctx.shadowBlur = 20; ctx.shadowColor = '#9d00ff';
-                    ctx.fillRect(powerUp.x, powerUp.y, powerUp.w, powerUp.h);
-                    ctx.fillStyle = '#fff';
-                    ctx.font = "bold 10px sans-serif";
-                    ctx.fillText("?", powerUp.x + 7, powerUp.y + 14);
-                    ctx.restore();
-                }
+            // Verifica se comeu a comida
+            if (cabeca.x === comidaX && cabeca.y === comidaY) {
+                pontuacao += 10;
+                document.getElementById("pontuacao").innerText = `Pontuação: ${pontuacao}`;
+                gerarComida();
             } else {
-               
-                ctx.fillStyle = "rgba(0,0,0,0.75)";
-                ctx.fillRect(0, 0, 800, 500);
-                ctx.textAlign = "center";
-                
-                if (gameState === 'MENU') {
-                    ctx.fillStyle = p1.color; ctx.font = "bold 35px 'Courier New'";
-                    ctx.fillText("CYBERPUNK PONG: EVO", 400, 200);
-                    ctx.fillStyle = "#fff"; ctx.font = "16px sans-serif";
-                    ctx.fillText("PRESSIONE ESPAÇO PARA ENTRAR NA REDE", 400, 280);
-                } else if (gameState === 'GAMEOVER') {
-                    ctx.fillStyle = winner === 'JOGADOR 1' ? p1.color : p2.color;
-                    ctx.font = "bold 35px 'Courier New'";
-                    ctx.fillText(`${winner} SE SOBERANIZOU!`, 400, 200);
-                    ctx.fillStyle = "#fff"; ctx.font = "16px sans-serif";
-                    ctx.fillText("Pressione ESPAÇO para Reiniciar o Sistema", 400, 280);
-                }
+                cobrinha.pop(); // Remove a cauda se não comeu
+            }
+        }
+
+        function verificarColisao() {
+            const cabeca = cobrinha[0];
+            
+            // Bateu nas paredes
+            if (cabeca.x < 0 || cabeca.x >= canvas.width || cabeca.y < 0 || cabeca.y >= canvas.height) {
+                jogoRodando = false;
             }
 
-            
-            ctx.save();
-            ctx.fillStyle = p1.color; ctx.shadowBlur = 15; ctx.shadowColor = p1.color;
-            ctx.fillRect(p1.x, p1.y, p1.w, p1.h);
-            ctx.restore();
-
-            
-            ctx.save();
-            ctx.fillStyle = p2.color; ctx.shadowBlur = 15; ctx.shadowColor = p2.color;
-            ctx.fillRect(p2.x, p2.y, p2.w, p2.h);
-            ctx.restore();
+            // Bateu no próprio corpo
+            for (let i = 1; i < cobrinha.length; i++) {
+                if (cabeca.x === cobrinha[i].x && cabeca.y === cobrinha[i].y) {
+                    jogoRodando = false;
+                }
+            }
         }
 
-        function loop() {
-            update();
-            draw();
-            requestAnimationFrame(loop);
+        function mudarDirecao(evento) {
+            const TECLA_ESQUERDA = 37;
+            const TECLA_DIREITA = 39;
+            const TECLA_CIMA = 38;
+            const TECLA_BAIXO = 40;
+
+            const teclaPressionada = evento.keyCode;
+            const indoCima = dy === -tamanhoGrid;
+            const indoBaixo = dy === tamanhoGrid;
+            const indoDireita = dx === tamanhoGrid;
+            const indoEsquerda = dx === -tamanhoGrid;
+
+            // Impede que a cobra dê "marcha ré" em si mesma
+            if (teclaPressionada === TECLA_ESQUERDA && !indoDireita) {
+                dx = -tamanhoGrid;
+                dy = 0;
+            }
+            if (teclaPressionada === TECLA_CIMA && !indoBaixo) {
+                dx = 0;
+                dy = -tamanhoGrid;
+            }
+            if (teclaPressionada === TECLA_DIREITA && !indoEsquerda) {
+                dx = tamanhoGrid;
+                dy = 0;
+            }
+            if (teclaPressionada === TECLA_BAIXO && !indoCima) {
+                dx = 0;
+                dy = tamanhoGrid;
+            }
         }
-        loop();
+
+        function atualizarJogo() {
+            if (!jogoRodando) {
+                ctx.fillStyle = "white";
+                ctx.font = "bold 35px sans-serif";
+                ctx.textAlign = "center";
+                ctx.fillText("Fim de Jogo!", canvas.width / 2, canvas.height / 2);
+                ctx.font = "20px sans-serif";
+                ctx.fillText("Recarregue a página para tentar de novo", canvas.width / 2, (canvas.height / 2) + 30);
+                return;
+            }
+
+            setTimeout(function onTick() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height); // Limpa a tela
+                desenharComida();
+                moverCobrinha();
+                verificarColisao();
+                desenharCobrinha();
+                atualizarJogo(); // Chama o loop novamente
+            }, 100); // Velocidade do jogo (quanto menor, mais rápido)
+        }
+
+        // Inicia os eventos e o jogo
+        document.addEventListener("keydown", mudarDirecao);
+        gerarComida();
+        atualizarJogo();
     </script>
 </body>
 </html>
