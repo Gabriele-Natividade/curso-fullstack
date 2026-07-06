@@ -58,15 +58,15 @@
         }
 
         function desenharComida() {
-            ctx.fillStyle = "#e74c3c"; // Cor da maçã
+            ctx.fillStyle = "#e74c3c";
             ctx.beginPath();
             ctx.arc(comidaX + tamanhoGrid/2, comidaY + tamanhoGrid/2, tamanhoGrid/2.5, 0, 2 * Math.PI);
             ctx.fill();
         }
 
         function desenharCobrinha() {
-            ctx.fillStyle = "#2ecc71"; // Cor da cobra
-            ctx.strokeStyle = "#27ae60"; // Borda da cobra
+            ctx.fillStyle = "#2ecc71"; 
+            ctx.strokeStyle = "#27ae60"; 
             cobrinha.forEach(parte => {
                 ctx.fillRect(parte.x, parte.y, tamanhoGrid, tamanhoGrid);
                 ctx.strokeRect(parte.x, parte.y, tamanhoGrid, tamanhoGrid);
