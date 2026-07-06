@@ -43,7 +43,7 @@
             border-radius: 5px;
             cursor: pointer;
             transition: background 0.2s;
-            display: none; /* Escondido por padrão, aparece no Game Over */
+            display: none; 
         }
         button:hover {
             background-color: #27ae60;
@@ -65,7 +65,7 @@
 
         const tamanhoGrid = 20;
         let cobrinha, dx, dy, comidaX, comidaY, pontuacao, jogoRodando;
-        let mudouDirecaoNesseTurno = false; // Trava para evitar colisão por clique duplo rápido
+        let mudouDirecaoNesseTurno = false; 
 
         function inicializar() {
             cobrinha = [
@@ -88,7 +88,7 @@
             comidaX = Math.floor(Math.random() * (canvas.width / tamanhoGrid)) * tamanhoGrid;
             comidaY = Math.floor(Math.random() * (canvas.height / tamanhoGrid)) * tamanhoGrid;
             
-            // Garante que a comida não vai nascer em cima da cobra
+            
             cobrinha.forEach(parte => {
                 if (parte.x === comidaX && parte.y === comidaY) gerarComida();
             });
