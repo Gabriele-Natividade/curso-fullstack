@@ -75,22 +75,20 @@
 
         function moverCobrinha() {
             const cabeca = { x: cobrinha[0].x + dx, y: cobrinha[0].y + dy };
-            cobrinha.unshift(cabeca); // Adiciona nova cabeça
+            cobrinha.unshift(cabeca); 
 
-            // Verifica se comeu a comida
             if (cabeca.x === comidaX && cabeca.y === comidaY) {
                 pontuacao += 10;
                 document.getElementById("pontuacao").innerText = `Pontuação: ${pontuacao}`;
                 gerarComida();
             } else {
-                cobrinha.pop(); // Remove a cauda se não comeu
+                cobrinha.pop(); 
             }
         }
 
         function verificarColisao() {
             const cabeca = cobrinha[0];
             
-            // Bateu nas paredes
             if (cabeca.x < 0 || cabeca.x >= canvas.width || cabeca.y < 0 || cabeca.y >= canvas.height) {
                 jogoRodando = false;
             }
