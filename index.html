@@ -146,16 +146,16 @@
             }
 
             setTimeout(function onTick() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height); // Limpa a tela
+                ctx.clearRect(0, 0, canvas.width, canvas.height); 
                 desenharComida();
                 moverCobrinha();
                 verificarColisao();
                 desenharCobrinha();
-                atualizarJogo(); // Chama o loop novamente
-            }, 100); // Velocidade do jogo (quanto menor, mais rápido)
+                atualizarJogo(); 
+            }, 100); 
         }
 
-        // Inicia os eventos e o jogo
+        
         document.addEventListener("keydown", mudarDirecao);
         gerarComida();
         atualizarJogo();
