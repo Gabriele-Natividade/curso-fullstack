@@ -103,7 +103,7 @@
 
         function desenharCobrinha() {
             cobrinha.forEach((parte, index) => {
-                // A cabeça (index 0) ganha uma cor levemente diferente
+                
                 ctx.fillStyle = index === 0 ? "#1abc9c" : "#2ecc71"; 
                 ctx.strokeStyle = "#27ae60"; 
                 
@@ -128,12 +128,12 @@
         function verificarColisao() {
             const cabeca = cobrinha[0];
             
-            // Colisão com as bordas
+            
             if (cabeca.x < 0 || cabeca.x >= canvas.width || cabeca.y < 0 || cabeca.y >= canvas.height) {
                 jogoRodando = false;
             }
 
-            // Colisão com o próprio corpo
+            
             for (let i = 1; i < cobrinha.length; i++) {
                 if (cabeca.x === cobrinha[i].x && cabeca.y === cobrinha[i].y) {
                     jogoRodando = false;
