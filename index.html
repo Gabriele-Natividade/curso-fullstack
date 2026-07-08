@@ -19,7 +19,7 @@
     <script>
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
-        const tam = 20; // Tamanho de cada bloco do grid
+        const tam = 20;
         let cobra, dx, dy, comidaX, comidaY, pontuacao, jogoRodando;
 
         function inicializar() {
@@ -50,11 +50,9 @@
             setTimeout(() => {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                // Mover Cobra
                 const cabeca = { x: cobra[0].x + dx, y: cobra[0].y + dy };
                 cobra.unshift(cabeca);
 
-                // Comer Comida ou Andar
                 if (cabeca.x === comidaX && cabeca.y === comidaY) {
                     pontuacao += 10;
                     document.getElementById("pontuacao").innerText = `Pontuação: ${pontuacao}`;
@@ -63,34 +61,4 @@
                     cobra.pop();
                 }
 
-                // Verificar Colisões (Paredes ou Corpo)
-                if (cabeca.x < 0 || cabeca.x >= canvas.width || cabeca.y < 0 || cabeca.y >= canvas.height ||
-                    cobra.slice(1).some(p => p.x === cabeca.x && p.y === cabeca.y)) {
-                    jogoRodando = false;
-                }
-
-                // Desenhar Comida
-                ctx.fillStyle = "#e74c3c";
-                ctx.fillRect(comidaX, comidaY, tam, tam);
-
-                // Desenhar Cobra
-                cobra.forEach((p, i) => {
-                    ctx.fillStyle = i === 0 ? "#1abc9c" : "#2ecc71";
-                    ctx.fillRect(p.x, p.y, tam, tam);
-                });
-
-                atualizarJogo();
-            }, 100);
-        }
-
-        window.addEventListener("keydown", e => {
-            if (e.keyCode === 37 && dx === 0) { dx = -tam; dy = 0; } // Esquerda
-            if (e.keyCode === 38 && dy === 0) { dx = 0; dy = -tam; } // Cima
-            if (e.keyCode === 39 && dx === 0) { dx = tam; dy = 0; }  // Direita
-            if (e.keyCode === 40 && dy === 0) { dx = 0; dy = tam; }  // Baixo
-        });
-
-        inicializar();
-    </script>
-</body>
-</html>
+                if (cab
