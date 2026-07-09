@@ -50,9 +50,22 @@
             setTimeout(() => {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+                // Movimenta a cabeça
                 const cabeca = { x: cobra[0].x + dx, y: cobra[0].y + dy };
+                
+                // Valida colisão com as bordas ou com o próprio corpo
+                const colidiuBorda = cabeca.x < 0 || cabeca.x >= canvas.width || cabeca.y < 0 || cabeca.y >= canvas.height;
+                const colidiuCorpo = cobra.some(p => p.x === cabeca.x && p.y === cabeca.y);
+
+                if (colidiuBorda || colidiuCorpo) {
+                    jogoRodando = false;
+                    atualizarJogo();
+                    return;
+                }
+
                 cobra.unshift(cabeca);
 
+                // Verifica se comeu a comida
                 if (cabeca.x === comidaX && cabeca.y === comidaY) {
                     pontuacao += 10;
                     document.getElementById("pontuacao").innerText = `Pontuação: ${pontuacao}`;
@@ -61,4 +74,29 @@
                     cobra.pop();
                 }
 
-                if (cab
+                // Desenha a comida
+                ctx.fillStyle = "#e74c3c";
+                ctx.fillRect(comidaX, comidaY, tam, tam);
+
+                // Desenha a cobrinha
+                ctx.fillStyle = "#2ecc71";
+                cobra.forEach(p => ctx.fillRect(p.x, p.y, tam, tam));
+
+                // Continua o ciclo do jogo
+                atualizarJogo();
+            }, 100); // Velocidade do jogo (100ms)
+        }
+
+        // Captura os comandos do teclado e evita que a cobra ande na direção oposta instantaneamente
+        window.addEventListener("keydown", e => {
+            if (e.key === "ArrowUp" && dy === 0) { dx = 0; dy = -tam; }
+            if (e.key === "ArrowDown" && dy === 0) { dx = 0; dy = tam; }
+            if (e.key === "ArrowLeft" && dx === 0) { dx = -tam; dy = 0; }
+            if (e.key === "ArrowRight" && dx === 0) { dx = tam; dy = 0; }
+        });
+
+        // Inicia o jogo automaticamente ao carregar a página
+        inicializar();
+    </script>
+</body>
+</html>
