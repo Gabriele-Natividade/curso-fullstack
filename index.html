@@ -52,10 +52,15 @@
 
                 const cabeca = { x: cobra[0].x + dx, y: cobra[0].y + dy };
                 
-                const colidiuBorda = cabeca.x < 0 || cabeca.x >= canvas.width || cabeca.y < 0 || cabeca.y >= canvas.height;
+                // ALTERAÇÃO: Efeito de atravessar as paredes (teletransporte)
+                if (cabeca.x < 0) cabeca.x = canvas.width - tam;
+                if (cabeca.x >= canvas.width) cabeca.x = 0;
+                if (cabeca.y < 0) cabeca.y = canvas.height - tam;
+                if (cabeca.y >= canvas.height) cabeca.y = 0;
+
                 const colidiuCorpo = cobra.some(p => p.x === cabeca.x && p.y === cabeca.y);
 
-                if (colidiuBorda || colidiuCorpo) {
+                if (colidiuCorpo) {
                     jogoRodando = false;
                     atualizarJogo();
                     return;
