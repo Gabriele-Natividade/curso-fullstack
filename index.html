@@ -2,17 +2,59 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Jogo da Cobrinha Simplificado</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo da Cobrinha Neon</title>
     <style>
-        body { background: #2c3e50; color: white; font-family: sans-serif; text-align: center; }
-        canvas { background: #34495e; border: 2px solid white; display: block; margin: 20px auto; }
-        #btnReiniciar { padding: 10px 20px; background: #2ecc71; color: white; border: none; cursor: pointer; font-size: 16px; }
+        body { 
+            background: #0d1117; 
+            color: #f0f6fc; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            text-align: center; 
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 2.5rem;
+            text-shadow: 0 0 10px #00ff88;
+            margin-bottom: 10px;
+        }
+        #pontuacao {
+            font-size: 1.5rem;
+            color: #00e5ff;
+            text-shadow: 0 0 5px rgba(0, 229, 255, 0.5);
+            margin-top: 0;
+        }
+        canvas { 
+            background: #161b22; 
+            border: 4px solid #30363d; 
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.8), 0 0 15px rgba(0, 255, 136, 0.2);
+            display: block; 
+            margin: 20px auto; 
+        }
+        #btnReiniciar { 
+            padding: 12px 28px; 
+            background: linear-gradient(45deg, #00ff88, #00e5ff); 
+            color: #0d1117; 
+            border: none; 
+            border-radius: 25px;
+            cursor: pointer; 
+            font-size: 18px; 
+            font-weight: bold;
+            text-transform: uppercase;
+            box-shadow: 0 4px 15px rgba(0, 255, 136, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        #btnReiniciar:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0, 229, 255, 0.6);
+        }
     </style>
 </head>
 <body>
 
-    <h1>🐍 Jogo da Cobrinha</h1>
-    <h2 id="pontuacao">Pontuação: 0</h2>
+    <h1>🐍 Cyber Snake</h1>
+    <h2 id="pontuacao">SCORE: 0</h2>
     <canvas id="gameCanvas" width="400" height="400"></canvas>
     <button id="btnReiniciar" onclick="inicializar()" style="display:none">Jogar Novamente</button>
 
@@ -26,7 +68,7 @@
             cobra = [{x: 160, y: 160}, {x: 140, y: 160}, {x: 120, y: 160}];
             dx = tam; dy = 0; pontuacao = 0; jogoRodando = true;
             document.getElementById("btnReiniciar").style.display = "none";
-            document.getElementById("pontuacao").innerText = "Pontuação: 0";
+            document.getElementById("pontuacao").innerText = "SCORE: 0";
             gerarComida();
             atualizarJogo();
         }
@@ -39,10 +81,20 @@
 
         function atualizarJogo() {
             if (!jogoRodando) {
-                ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+                ctx.fillStyle = "rgba(13, 17, 23, 0.85)";
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = "white"; ctx.font = "30px sans-serif"; ctx.textAlign = "center";
-                ctx.fillText("Fim de Jogo!", canvas.width / 2, canvas.height / 2);
+                
+                // Texto de Game Over estilizado
+                ctx.fillStyle = "#ff3366"; 
+                ctx.font = "bold 35px sans-serif"; 
+                ctx.textAlign = "center";
+                ctx.shadowColor = "#ff3366";
+                ctx.shadowBlur = 10;
+                ctx.fillText("FIM DE JOGO", canvas.width / 2, canvas.height / 2);
+                
+                // Reset do shadow para não afetar outros elementos na próxima rodada
+                ctx.shadowBlur = 0; 
+                
                 document.getElementById("btnReiniciar").style.display = "inline-block";
                 return;
             }
@@ -52,7 +104,7 @@
 
                 const cabeca = { x: cobra[0].x + dx, y: cobra[0].y + dy };
                 
-                // ALTERAÇÃO: Efeito de atravessar as paredes (teletransporte)
+                // Efeito de atravessar as paredes (mantido)
                 if (cabeca.x < 0) cabeca.x = canvas.width - tam;
                 if (cabeca.x >= canvas.width) cabeca.x = 0;
                 if (cabeca.y < 0) cabeca.y = canvas.height - tam;
@@ -70,17 +122,33 @@
 
                 if (cabeca.x === comidaX && cabeca.y === comidaY) {
                     pontuacao += 10;
-                    document.getElementById("pontuacao").innerText = `Pontuação: ${pontuacao}`;
+                    document.getElementById("pontuacao").innerText = `SCORE: ${pontuacao}`;
                     gerarComida();
                 } else {
                     cobra.pop();
                 }
 
-                ctx.fillStyle = "#e74c3c";
-                ctx.fillRect(comidaX, comidaY, tam, tam);
+                // Desenho da Comida com brilho neon
+                ctx.fillStyle = "#ff3366";
+                ctx.shadowColor = "#ff3366";
+                ctx.shadowBlur = 8;
+                ctx.fillRect(comidaX + 2, comidaY + 2, tam - 4, tam - 4);
 
-                ctx.fillStyle = "#2ecc71";
-                cobra.forEach(p => ctx.fillRect(p.x, p.y, tam, tam));
+                // Desenho da Cobrinha (Cabeça com cor diferente do corpo)
+                cobra.forEach((p, index) => {
+                    if (index === 0) {
+                        ctx.fillStyle = "#00e5ff"; // Cor da cabeça
+                        ctx.shadowColor = "#00e5ff";
+                    } else {
+                        ctx.fillStyle = "#00ff88"; // Cor do corpo
+                        ctx.shadowColor = "#00ff88";
+                    }
+                    ctx.shadowBlur = 4;
+                    // Deixa um pequeno espaçamento entre os blocos para um efeito visual melhor
+                    ctx.fillRect(p.x + 1, p.y + 1, tam - 2, tam - 2);
+                });
+                
+                ctx.shadowBlur = 0; // Reseta o blur
 
                 atualizarJogo();
             }, 100);
