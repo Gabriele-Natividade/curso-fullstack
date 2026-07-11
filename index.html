@@ -84,7 +84,7 @@
                 ctx.fillStyle = "rgba(13, 17, 23, 0.85)";
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                 
-                // Texto de Game Over estilizado
+                
                 ctx.fillStyle = "#ff3366"; 
                 ctx.font = "bold 35px sans-serif"; 
                 ctx.textAlign = "center";
@@ -92,7 +92,7 @@
                 ctx.shadowBlur = 10;
                 ctx.fillText("FIM DE JOGO", canvas.width / 2, canvas.height / 2);
                 
-                // Reset do shadow para não afetar outros elementos na próxima rodada
+                
                 ctx.shadowBlur = 0; 
                 
                 document.getElementById("btnReiniciar").style.display = "inline-block";
@@ -104,7 +104,7 @@
 
                 const cabeca = { x: cobra[0].x + dx, y: cobra[0].y + dy };
                 
-                // Efeito de atravessar as paredes (mantido)
+                
                 if (cabeca.x < 0) cabeca.x = canvas.width - tam;
                 if (cabeca.x >= canvas.width) cabeca.x = 0;
                 if (cabeca.y < 0) cabeca.y = canvas.height - tam;
@@ -128,27 +128,26 @@
                     cobra.pop();
                 }
 
-                // Desenho da Comida com brilho neon
                 ctx.fillStyle = "#ff3366";
                 ctx.shadowColor = "#ff3366";
                 ctx.shadowBlur = 8;
                 ctx.fillRect(comidaX + 2, comidaY + 2, tam - 4, tam - 4);
 
-                // Desenho da Cobrinha (Cabeça com cor diferente do corpo)
+                
                 cobra.forEach((p, index) => {
                     if (index === 0) {
-                        ctx.fillStyle = "#00e5ff"; // Cor da cabeça
+                        ctx.fillStyle = "#00e5ff"; 
                         ctx.shadowColor = "#00e5ff";
                     } else {
-                        ctx.fillStyle = "#00ff88"; // Cor do corpo
+                        ctx.fillStyle = "#00ff88"; 
                         ctx.shadowColor = "#00ff88";
                     }
                     ctx.shadowBlur = 4;
-                    // Deixa um pequeno espaçamento entre os blocos para um efeito visual melhor
+                    
                     ctx.fillRect(p.x + 1, p.y + 1, tam - 2, tam - 2);
                 });
                 
-                ctx.shadowBlur = 0; // Reseta o blur
+                ctx.shadowBlur = 0; 
 
                 atualizarJogo();
             }, 100);
