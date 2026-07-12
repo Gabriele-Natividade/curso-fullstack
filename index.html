@@ -66,8 +66,8 @@
         let cobra, dx, dy, comidaX, comidaY, pontuacao, jogoRodando;
         let mudarDirecao = false; 
         let jogoTimeout; 
+
         function inicializar() {
-           
             if (jogoTimeout) clearTimeout(jogoTimeout);
 
             cobra = [{x: 160, y: 160}, {x: 140, y: 160}, {x: 120, y: 160}];
@@ -119,7 +119,6 @@
                 if (cabeca.y < 0) cabeca.y = canvas.height - tam;
                 if (cabeca.y >= canvas.height) cabeca.y = 0;
 
-               
                 const colidiuCorpo = cobra.some(p => p.x === cabeca.x && p.y === cabeca.y);
                 if (colidiuCorpo) {
                     jogoRodando = false;
@@ -137,7 +136,6 @@
                     cobra.pop();
                 }
 
-                
                 ctx.fillStyle = "#ff3366";
                 ctx.shadowColor = "#ff3366";
                 ctx.shadowBlur = 8;
@@ -162,7 +160,6 @@
         }
 
         window.addEventListener("keydown", e => {
-            
             if (mudarDirecao) return;
 
             if (e.key === "ArrowUp" && dy === 0) { dx = 0; dy = -tam; mudarDirecao = true; }
