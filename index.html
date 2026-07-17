@@ -3,60 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jogo da Cobrinha Neon</title>
+    <title>Cyber Snake Pro</title>
     <style>
         body { 
-            background: #0d1117; 
+            background: #080b10; 
             color: #f0f6fc; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            font-family: 'Segoe UI', system-ui, sans-serif; 
             text-align: center; 
             margin: 0;
-            padding: 20px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        .header-container {
+            margin-bottom: 5px;
         }
         h1 {
-            font-size: 2.5rem;
-            text-shadow: 0 0 10px #00ff88;
+            font-size: 2rem;
+            margin: 0 0 5px 0;
+            color: #00ff88;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+            letter-spacing: 2px;
+        }
+        .placar-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            font-size: 1.1rem;
+            font-weight: bold;
             margin-bottom: 10px;
         }
-        #pontuacao {
-            font-size: 1.5rem;
-            color: #00e5ff;
-            text-shadow: 0 0 5px rgba(0, 229, 255, 0.5);
-            margin-top: 0;
+        #pontuacao { color: #00e5ff; text-shadow: 0 0 5px rgba(0, 229, 255, 0.4); }
+        #recorde { color: #ff3366; text-shadow: 0 0 5px rgba(255, 51, 102, 0.4); }
+        .canvas-area {
+            position: relative;
+            margin-bottom: 15px;
         }
         canvas { 
-            background: #161b22; 
-            border: 4px solid #30363d; 
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.8), 0 0 15px rgba(0, 255, 136, 0.2);
+            background: #11161d; 
+            border: 3px solid #1f242c; 
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 20px rgba(0, 255, 136, 0.15);
             display: block; 
-            margin: 20px auto; 
+            max-width: 100%;
+            height: auto;
         }
+        .controles-container {
+            display: grid;
+            grid-template-columns: repeat(3, 60px);
+            grid-template-rows: repeat(3, 60px);
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .btn-controle {
+            background: #161b22;
+            border: 2px solid #30363d;
+            color: #00ff88;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            transition: background 0.1s, border-color 0.1s, transform 0.1s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .btn-controle:active {
+            transform: scale(0.92);
+            background: #00ff88;
+            color: #080b10;
+            border-color: #00ff88;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.6);
+        }
+        #btnUp { grid-column: 2; }
+        #btnLeft { grid-column: 1; grid-row: 2; }
+        #btnRight { grid-column: 3; grid-row: 2; }
+        #btnDown { grid-column: 2; grid-row: 3; }
         #btnReiniciar { 
-            padding: 12px 28px; 
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 14px 30px; 
             background: linear-gradient(45deg, #00ff88, #00e5ff); 
-            color: #0d1117; 
+            color: #080b10; 
             border: none; 
-            border-radius: 25px;
+            border-radius: 30px;
             cursor: pointer; 
-            font-size: 18px; 
+            font-size: 16px; 
             font-weight: bold;
             text-transform: uppercase;
-            box-shadow: 0 4px 15px rgba(0, 255, 136, 0.4);
-            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 20px rgba(0, 255, 136, 0.5);
+            display: none;
+            z-index: 10;
         }
         #btnReiniciar:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 20px rgba(0, 229, 255, 0.6);
+            transform: translate(-50%, -50%) scale(1.05);
+            box-shadow: 0 6px 25px rgba(0, 229, 255, 0.7);
+        }
+        @media(min-width: 768px) {
+            .controles-container {
+                display: none;
+            }
         }
     </style>
 </head>
 <body>
 
-    <h1>🐍 Cyber Snake</h1>
-    <h2 id="pontuacao">SCORE: 0</h2>
-    <canvas id="gameCanvas" width="400" height="400"></canvas>
-    <button id="btnReiniciar" onclick="inicializar()" style="display:none">Jogar Novamente</button>
+    <div class="header-container">
+        <h1>🐍 CYBER SNAKE</h1>
+        <div class="placar-container">
+            <span id="pontuacao">SCORE: 0</span>
+            <span id="recorde">HIGH: 0</span>
+        </div>
+    </div>
+
+    <div class="canvas-area">
+        <canvas id="gameCanvas" width="400" height="400"></canvas>
+        <button id="btnReiniciar" onclick="inicializar()">Jogar Novamente</button>
+    </div>
+
+    <div class="controles-container">
+        <button class="btn-controle" id="btnUp">↑</button>
+        <button class="btn-controle" id="btnLeft">←</button>
+        <button class="btn-controle" id="btnRight">→</button>
+        <button class="btn-controle" id="btnDown">↓</button>
+    </div>
 
     <script>
         const canvas = document.getElementById("gameCanvas");
@@ -66,6 +144,10 @@
         let cobra, dx, dy, comidaX, comidaY, pontuacao, jogoRodando;
         let mudarDirecao = false; 
         let jogoTimeout; 
+        let velocidade = 120;
+        let recorde = localStorage.getItem("snakeHighScore") || 0;
+
+        document.getElementById("recorde").innerText = `HIGH: ${recorde}`;
 
         function inicializar() {
             if (jogoTimeout) clearTimeout(jogoTimeout);
@@ -74,6 +156,7 @@
             dx = tam; 
             dy = 0; 
             pontuacao = 0; 
+            velocidade = 120;
             jogoRodando = true;
             mudarDirecao = false;
 
@@ -87,20 +170,19 @@
         function gerarComida() {
             comidaX = Math.floor(Math.random() * (canvas.width / tam)) * tam;
             comidaY = Math.floor(Math.random() * (canvas.height / tam)) * tam;
-           
             if (cobra.some(p => p.x === comidaX && p.y === comidaY)) gerarComida();
         }
 
         function atualizarJogo() {
             if (!jogoRodando) {
-                ctx.fillStyle = "rgba(13, 17, 23, 0.85)";
+                ctx.fillStyle = "rgba(8, 11, 16, 0.85)";
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                 
                 ctx.fillStyle = "#ff3366"; 
-                ctx.font = "bold 35px sans-serif"; 
+                ctx.font = "bold 32px system-ui, sans-serif"; 
                 ctx.textAlign = "center";
                 ctx.shadowColor = "#ff3366";
-                ctx.shadowBlur = 10;
+                ctx.shadowBlur = 15;
                 ctx.fillText("FIM DE JOGO", canvas.width / 2, canvas.height / 2);
                 
                 ctx.shadowBlur = 0; 
@@ -131,6 +213,14 @@
                 if (cabeca.x === comidaX && cabeca.y === comidaY) {
                     pontuacao += 10;
                     document.getElementById("pontuacao").innerText = `SCORE: ${pontuacao}`;
+                    
+                    if (pontuacao > recorde) {
+                        recorde = pontuacao;
+                        localStorage.setItem("snakeHighScore", recorde);
+                        document.getElementById("recorde").innerText = `HIGH: ${recorde}`;
+                    }
+
+                    if (velocidade > 50) velocidade -= 3;
                     gerarComida();
                 } else {
                     cobra.pop();
@@ -138,8 +228,8 @@
 
                 ctx.fillStyle = "#ff3366";
                 ctx.shadowColor = "#ff3366";
-                ctx.shadowBlur = 8;
-                ctx.fillRect(comidaX + 2, comidaY + 2, tam - 4, tam - 4);
+                ctx.shadowBlur = 10;
+                ctx.fillRect(comidaX + 3, comidaY + 3, tam - 6, tam - 6);
 
                 cobra.forEach((p, index) => {
                     if (index === 0) {
@@ -149,24 +239,30 @@
                         ctx.fillStyle = "#00ff88"; 
                         ctx.shadowColor = "#00ff88";
                     }
-                    ctx.shadowBlur = 4;
+                    ctx.shadowBlur = 6;
                     ctx.fillRect(p.x + 1, p.y + 1, tam - 2, tam - 2);
                 });
                 
                 ctx.shadowBlur = 0; 
-
                 atualizarJogo();
-            }, 100);
+            }, velocidade);
         }
 
-        window.addEventListener("keydown", e => {
+        function mudarDirecaoPara(novaTecla) {
             if (mudarDirecao) return;
 
-            if (e.key === "ArrowUp" && dy === 0) { dx = 0; dy = -tam; mudarDirecao = true; }
-            if (e.key === "ArrowDown" && dy === 0) { dx = 0; dy = tam; mudarDirecao = true; }
-            if (e.key === "ArrowLeft" && dx === 0) { dx = -tam; dy = 0; mudarDirecao = true; }
-            if (e.key === "ArrowRight" && dx === 0) { dx = tam; dy = 0; mudarDirecao = true; }
-        });
+            if (novaTecla === "ArrowUp" && dy === 0) { dx = 0; dy = -tam; mudarDirecao = true; }
+            if (novaTecla === "ArrowDown" && dy === 0) { dx = 0; dy = tam; mudarDirecao = true; }
+            if (novaTecla === "ArrowLeft" && dx === 0) { dx = -tam; dy = 0; mudarDirecao = true; }
+            if (novaTecla === "ArrowRight" && dx === 0) { dx = tam; dy = 0; mudarDirecao = true; }
+        }
+
+        window.addEventListener("keydown", e => mudarDirecaoPara(e.key));
+
+        document.getElementById("btnUp").addEventListener("click", () => mudarDirecaoPara("ArrowUp"));
+        document.getElementById("btnDown").addEventListener("click", () => mudarDirecaoPara("ArrowDown"));
+        document.getElementById("btnLeft").addEventListener("click", () => mudarDirecaoPara("ArrowLeft"));
+        document.getElementById("btnRight").addEventListener("click", () => mudarDirecaoPara("ArrowRight"));
 
         inicializar();
     </script>
