@@ -43,7 +43,6 @@
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.7);
         }
 
-        /* Área do Tabuleiro */
         #canvas-wrapper {
             position: relative;
         }
@@ -55,7 +54,6 @@
             display: block;
         }
 
-        /* Painel Lateral de Status */
         #sidebar {
             display: flex;
             flex-direction: column;
@@ -106,7 +104,6 @@
             text-shadow: 1px 1px 2px black;
         }
 
-        /* Logs de Combate */
         #log-container {
             height: 180px;
             overflow-y: auto;
@@ -131,7 +128,6 @@
         .log-enemy { color: #f87171; }
         .log-system { color: #fbbf24; }
 
-        /* Controles / Instruções */
         .controls-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -150,12 +146,10 @@
 <body>
 
 <div id="game-container">
-    <!-- LADO ESQUERDO: CANVAS -->
     <div id="canvas-wrapper">
         <canvas id="gameCanvas" width="600" height="600"></canvas>
     </div>
 
-    <!-- LADO DIREITO: INTERFACE -->
     <div id="sidebar">
         <div>
             <div class="panel-section">
@@ -200,25 +194,20 @@
 </div>
 
 <script>
-    /**
-     * CONFIGURAÇÕES GLOBAIS DA ARQUITETURA DO JOGO
-     */
     const CANVAS = document.getElementById('gameCanvas');
     const CTX = CANVAS.getContext('2d');
     const TILE_SIZE = 40; 
-    const GRID_SIZE = 15; // 15x15 blocos = 600x600 pixels
+    const GRID_SIZE = 15;
 
-    // Definição dos tipos de Tiles
     const TILES = {
         WALL: 0,
         FLOOR: 1,
         STAIRS: 2
     };
 
-    // Engine State
     const state = {
         map: [],
-        visibleMap: [], // Sistema de Fog of War (0: Oculto, 1: Já visto, 2: Visível agora)
+        visibleMap: [],
         player: {
             x: 1,
             y: 1,
@@ -233,29 +222,22 @@
         floor: 1
     };
 
-    /**
-     * PROCEDURAL MAP GENERATOR (Gerador de Mapas Estruturado)
-     */
     function generateDungeon() {
         state.map = Array(GRID_SIZE).fill(null).map(() => Array(GRID_SIZE).fill(TILES.WALL));
         state.visibleMap = Array(GRID_SIZE).fill(null).map(() => Array(GRID_SIZE).fill(0));
         
-        // Criar salas simples escavando o mapa básico
         createRoom(1, 1, 4, 4);
         createRoom(8, 2, 5, 4);
         createRoom(2, 9, 5, 5);
         createRoom(9, 9, 5, 4);
 
-        // Conectar corredores de forma limpa
         digCorridorHorizontal(3, 1, 9);
         digCorridorVertical(9, 3, 9);
         digCorridorHorizontal(9, 4, 11);
         digCorridorVertical(4, 4, 9);
 
-        // Posicionar Escadas de descida na última sala
         state.map[12][11] = TILES.STAIRS;
 
-        // Resetar posições do player e gerar inimigos
         state.player.x = 2;
         state.player.y = 2;
         
@@ -293,7 +275,6 @@
             {x: 11, y: 11, hp: 35, maxHp: 35, name: "Esqueleto Magor", color: "#fca5a5"}
         ];
 
-        // Aumenta dificuldade dinamicamente com base no andar atual
         spawnPoints.forEach(ep => {
             state.enemies.push({
                 x: ep.x,
@@ -307,18 +288,13 @@
         });
     }
 
-    /**
-     * VISÃO E NÉVOA DE GUERRA (Fog of War Dinâmico por Raycasting Ray-to-Tile)
-     */
     function updateFogOfWar() {
-        // Passa o estado anterior de visível (2) para explorado (1)
         for (let y = 0; y < GRID_SIZE; y++) {
             for (let x = 0; x < GRID_SIZE; x++) {
                 if (state.visibleMap[y][x] === 2) state.visibleMap[y][x] = 1;
             }
         }
 
-        // Campo de visão simples (Raio em cruz e diagonal)
         const radius = 4;
         for (let dY = -radius; dY <= radius; dY++) {
             for (let dX = -radius; dX <= radius; dX++) {
@@ -327,24 +303,19 @@
                     const targetY = state.player.y + dY;
 
                     if (targetX >= 0 && targetX < GRID_SIZE && targetY >= 0 && targetY < GRID_SIZE) {
-                        state.visibleMap[targetY][targetX] = 2; // Visível em tempo real
+                        state.visibleMap[targetY][targetX] = 2;
                     }
                 }
             }
         }
     }
 
-    /**
-     * CONTROLE DO FLUXO DE TURNOS E GAMEPLAY
-     */
     function handlePlayerMove(dx, dy) {
         const targetX = state.player.x + dx;
         const targetY = state.player.y + dy;
 
-        // 1. Bloqueio de colisão com parede física
         if (state.map[targetY][targetX] === TILES.WALL) return;
 
-        // 2. Detecção e resolução de Combate Corpo a Corpo
         const enemy = state.enemies.find(e => e.x === targetX && e.y === targetY);
         if (enemy) {
             executeAttack(state.player, enemy);
@@ -352,11 +323,9 @@
             return;
         }
 
-        // 3. Movimentação limpa
         state.player.x = targetX;
         state.player.y = targetY;
 
-        // 4. Interação com elementos do mapa (Escadas)
         if (state.map[state.player.y][state.player.x] === TILES.STAIRS) {
             state.floor++;
             addLog(`Você desceu para o Andar ${state.floor}!`, 'system');
@@ -365,7 +334,6 @@
             return;
         }
 
-        // Regen passiva leve de Mana por andar percorrido
         if (state.player.mp < state.player.maxMp) state.player.mp = Math.min(state.player.maxMp, state.player.mp + 1);
 
         updateFogOfWar();
@@ -378,7 +346,6 @@
             return;
         }
 
-        // Alvo mais próximo visível
         const target = state.enemies.find(e => state.visibleMap[e.y][e.x] === 2);
         
         if (!target) {
@@ -418,25 +385,19 @@
         }
     }
 
-    /**
-     * INTELIGÊNCIA ARTIFICIAL DOS INIMIGOS (Turno Adversário)
-     */
     function processEnemyTurn() {
         state.enemies.forEach(enemy => {
             const distanceX = state.player.x - enemy.x;
             const distanceY = state.player.y - enemy.y;
             const distance = Math.sqrt(distanceX*distanceX + distanceY*distanceY);
 
-            // Se estiver colado no player, ataca
             if (distance <= 1.5) {
                 executeAttack(enemy, state.player);
             } 
-            // Se vir o player (estiver na zona visível do player), persegue
             else if (state.visibleMap[enemy.y][enemy.x] === 2) {
                 const nextDx = Math.sign(distanceX);
                 const nextDy = Math.sign(distanceY);
 
-                // Tenta mover na direção ideal calculando o eixo mais distante primeiro
                 let stepX = enemy.x + nextDx;
                 let stepY = enemy.y + nextDy;
 
@@ -456,9 +417,6 @@
         return state.enemies.some(e => e.x === x && e.y === y);
     }
 
-    /**
-     * RENDERIZAÇÃO GRÁFICA DO ENGINE (HTML5 Canvas)
-     */
     function render() {
         CTX.clearRect(0, 0, CANVAS.width, CANVAS.height);
 
@@ -466,14 +424,12 @@
             for (let x = 0; x < GRID_SIZE; x++) {
                 const visibility = state.visibleMap[y][x];
                 
-                // Se o tile nunca foi visto, desenha preto absoluto
                 if (visibility === 0) {
                     CTX.fillStyle = '#000000';
                     CTX.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
                     continue;
                 }
 
-                // Render Base do terreno
                 if (state.map[y][x] === TILES.WALL) {
                     CTX.fillStyle = visibility === 2 ? '#3b3b4f' : '#22222f';
                 } else if (state.map[y][x] === TILES.STAIRS) {
@@ -484,22 +440,18 @@
                 
                 CTX.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
                 
-                // Bordas leves para grid táctico estruturado
                 CTX.strokeStyle = 'rgba(255, 255, 255, 0.02)';
                 CTX.strokeRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
             }
         }
 
-        // Renderizar Inimigos Visíveis
         state.enemies.forEach(enemy => {
             if (state.visibleMap[enemy.y][enemy.x] === 2) {
-                // Desenha corpo
                 CTX.fillStyle = enemy.color;
                 CTX.beginPath();
                 CTX.arc(enemy.x * TILE_SIZE + TILE_SIZE/2, enemy.y * TILE_SIZE + TILE_SIZE/2, TILE_SIZE/2.5, 0, Math.PI * 2);
                 CTX.fill();
 
-                // Barra de vida interna flutuante do monstro
                 const hpPercent = enemy.hp / enemy.maxHp;
                 CTX.fillStyle = 'rgba(0,0,0,0.6)';
                 CTX.fillRect(enemy.x * TILE_SIZE + 4, enemy.y * TILE_SIZE + 4, TILE_SIZE - 8, 4);
@@ -508,22 +460,17 @@
             }
         });
 
-        // Renderizar Jogador
-        CTX.fillStyle = '#a855f7'; // Roxo Vibrante
+        CTX.fillStyle = '#a855f7'; 
         CTX.beginPath();
         CTX.arc(state.player.x * TILE_SIZE + TILE_SIZE/2, state.player.y * TILE_SIZE + TILE_SIZE/2, TILE_SIZE/2.2, 0, Math.PI * 2);
         CTX.fill();
         
-        // Brilho central no Player
         CTX.fillStyle = '#ffffff';
         CTX.beginPath();
         CTX.arc(state.player.x * TILE_SIZE + TILE_SIZE/2 - 3, state.player.y * TILE_SIZE + TILE_SIZE/2 - 3, 3, 0, Math.PI * 2);
         CTX.fill();
     }
 
-    /**
-     * SISTEMA DE INTERFACE (UI & OUTPUTS)
-     */
     function updateUI() {
         const hpPercent = (state.player.hp / state.player.maxHp) * 100;
         const mpPercent = (state.player.mp / state.player.maxMp) * 100;
@@ -556,9 +503,6 @@
         render();
     }
 
-    /**
-     * INTERCEPTAÇÃO DE TECLADO / CONTROLES
-     */
     window.addEventListener('keydown', e => {
         switch(e.key.toLowerCase()) {
             case 'arrowup':
@@ -578,7 +522,6 @@
                 handlePlayerMove(1, 0);
                 break;
             case ' ':
-                // Passa o turno guardando posição e agindo inimigos
                 addLog("Você aguardou um momento.", "system");
                 processEnemyTurn();
                 break;
@@ -588,7 +531,6 @@
         }
     });
 
-    // Inicialização da aplicação
     resetGame();
 </script>
 
