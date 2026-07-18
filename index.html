@@ -3,268 +3,594 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cyber Snake Pro</title>
+    <title>Shadow Dungeon - RPG Tático</title>
     <style>
-        body { 
-            background: #080b10; 
-            color: #f0f6fc; 
-            font-family: 'Segoe UI', system-ui, sans-serif; 
-            text-align: center; 
+        :root {
+            --bg-color: #0d0d13;
+            --panel-color: #1a1a24;
+            --border-color: #3a3a50;
+            --text-color: #e2e8f0;
+            --accent-color: #9333ea;
+            --hp-color: #ef4444;
+            --mp-color: #3b82f6;
+        }
+
+        * {
+            box-sizing: border-box;
             margin: 0;
-            padding: 10px;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        #game-container {
+            display: grid;
+            grid-template-columns: 600px 300px;
+            gap: 20px;
+            background-color: var(--panel-color);
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid var(--border-color);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.7);
+        }
+
+        /* Área do Tabuleiro */
+        #canvas-wrapper {
+            position: relative;
+        }
+
+        canvas {
+            background-color: #050507;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            display: block;
+        }
+
+        /* Painel Lateral de Status */
+        #sidebar {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            box-sizing: border-box;
+            justify-content: space-between;
         }
-        .header-container {
-            margin-bottom: 5px;
-        }
-        h1 {
-            font-size: 2rem;
-            margin: 0 0 5px 0;
-            color: #00ff88;
-            text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
-            letter-spacing: 2px;
-        }
-        .placar-container {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            font-size: 1.1rem;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        #pontuacao { color: #00e5ff; text-shadow: 0 0 5px rgba(0, 229, 255, 0.4); }
-        #recorde { color: #ff3366; text-shadow: 0 0 5px rgba(255, 51, 102, 0.4); }
-        .canvas-area {
-            position: relative;
+
+        .panel-section {
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
             margin-bottom: 15px;
         }
-        canvas { 
-            background: #11161d; 
-            border: 3px solid #1f242c; 
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 20px rgba(0, 255, 136, 0.15);
-            display: block; 
-            max-width: 100%;
-            height: auto;
-        }
-        .controles-container {
-            display: grid;
-            grid-template-columns: repeat(3, 60px);
-            grid-template-rows: repeat(3, 60px);
-            gap: 8px;
-            margin-top: 10px;
-        }
-        .btn-controle {
-            background: #161b22;
-            border: 2px solid #30363d;
-            color: #00ff88;
-            border-radius: 50%;
-            font-size: 1.5rem;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            user-select: none;
-            transition: background 0.1s, border-color 0.1s, transform 0.1s;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
-        .btn-controle:active {
-            transform: scale(0.92);
-            background: #00ff88;
-            color: #080b10;
-            border-color: #00ff88;
-            box-shadow: 0 0 15px rgba(0, 255, 136, 0.6);
-        }
-        #btnUp { grid-column: 2; }
-        #btnLeft { grid-column: 1; grid-row: 2; }
-        #btnRight { grid-column: 3; grid-row: 2; }
-        #btnDown { grid-column: 2; grid-row: 3; }
-        #btnReiniciar { 
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            padding: 14px 30px; 
-            background: linear-gradient(45deg, #00ff88, #00e5ff); 
-            color: #080b10; 
-            border: none; 
-            border-radius: 30px;
-            cursor: pointer; 
-            font-size: 16px; 
-            font-weight: bold;
+
+        h2 {
+            font-size: 1.2rem;
+            color: var(--accent-color);
+            margin-bottom: 10px;
             text-transform: uppercase;
-            box-shadow: 0 4px 20px rgba(0, 255, 136, 0.5);
-            display: none;
-            z-index: 10;
+            letter-spacing: 1px;
         }
-        #btnReiniciar:hover {
-            transform: translate(-50%, -50%) scale(1.05);
-            box-shadow: 0 6px 25px rgba(0, 229, 255, 0.7);
+
+        .stat-bar {
+            background-color: #2d3748;
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 5px;
+            position: relative;
         }
-        @media(min-width: 768px) {
-            .controles-container {
-                display: none;
-            }
+
+        .stat-fill {
+            height: 100%;
+            transition: width 0.2s ease-out;
+        }
+
+        #hp-fill { background-color: var(--hp-color); }
+        #mp-fill { background-color: var(--mp-color); }
+
+        .stat-text {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            font-size: 0.75rem;
+            font-weight: bold;
+            line-height: 20px;
+            color: white;
+            text-shadow: 1px 1px 2px black;
+        }
+
+        /* Logs de Combate */
+        #log-container {
+            height: 180px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 0.85rem;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding-right: 5px;
+        }
+
+        #log-container::-webkit-scrollbar {
+            width: 4px;
+        }
+        #log-container::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 2px;
+        }
+
+        .log-entry { padding: 2px 4px; border-radius: 3px; }
+        .log-player { color: #4ade80; }
+        .log-enemy { color: #f87171; }
+        .log-system { color: #fbbf24; }
+
+        /* Controles / Instruções */
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            font-size: 0.8rem;
+        }
+
+        kbd {
+            background: #2d3748;
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid #4a5568;
         }
     </style>
 </head>
 <body>
 
-    <div class="header-container">
-        <h1>🐍 CYBER SNAKE</h1>
-        <div class="placar-container">
-            <span id="pontuacao">SCORE: 0</span>
-            <span id="recorde">HIGH: 0</span>
+<div id="game-container">
+    <!-- LADO ESQUERDO: CANVAS -->
+    <div id="canvas-wrapper">
+        <canvas id="gameCanvas" width="600" height="600"></canvas>
+    </div>
+
+    <!-- LADO DIREITO: INTERFACE -->
+    <div id="sidebar">
+        <div>
+            <div class="panel-section">
+                <h2>Jogador (Turno)</h2>
+                <div>
+                    <span>Vida (HP):</span>
+                    <div class="stat-bar">
+                        <div id="hp-fill" class="stat-fill" style="width: 100%;"></div>
+                        <span id="hp-text" class="stat-text">100 / 100</span>
+                    </div>
+                </div>
+                <div style="margin-top: 10px;">
+                    <span>Mana (MP):</span>
+                    <div class="stat-bar">
+                        <div id="mp-fill" class="stat-fill" style="width: 100%;"></div>
+                        <span id="mp-text" class="stat-text">50 / 50</span>
+                    </div>
+                </div>
+                <div style="margin-top: 12px; font-size: 0.9rem;">
+                    Status: <strong id="floor-display" style="color: var(--accent-color)">Andar 1</strong>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <h2>Histórico de Ações</h2>
+                <div id="log-container"></div>
+            </div>
+        </div>
+
+        <div class="panel-section" style="margin-bottom: 0;">
+            <h2>Comandos</h2>
+            <div class="controls-grid">
+                <div><kbd>Seta ↑</kbd> / <kbd>W</kbd> Mover Norte</div>
+                <div><kbd>Seta ↓</kbd> / <kbd>S</kbd> Mover Sul</div>
+                <div><kbd>Seta ←</kbd> / <kbd>A</kbd> Mover Oeste</div>
+                <div><kbd>Seta →</kbd> / <kbd>D</kbd> Mover Leste</div>
+                <div><kbd>Espaço</kbd> Passar Turno</div>
+                <div><kbd>F</kbd> Magia (15 MP)</div>
+            </div>
         </div>
     </div>
+</div>
 
-    <div class="canvas-area">
-        <canvas id="gameCanvas" width="400" height="400"></canvas>
-        <button id="btnReiniciar" onclick="inicializar()">Jogar Novamente</button>
-    </div>
+<script>
+    /**
+     * CONFIGURAÇÕES GLOBAIS DA ARQUITETURA DO JOGO
+     */
+    const CANVAS = document.getElementById('gameCanvas');
+    const CTX = CANVAS.getContext('2d');
+    const TILE_SIZE = 40; 
+    const GRID_SIZE = 15; // 15x15 blocos = 600x600 pixels
 
-    <div class="controles-container">
-        <button class="btn-controle" id="btnUp">↑</button>
-        <button class="btn-controle" id="btnLeft">←</button>
-        <button class="btn-controle" id="btnRight">→</button>
-        <button class="btn-controle" id="btnDown">↓</button>
-    </div>
+    // Definição dos tipos de Tiles
+    const TILES = {
+        WALL: 0,
+        FLOOR: 1,
+        STAIRS: 2
+    };
 
-    <script>
-        const canvas = document.getElementById("gameCanvas");
-        const ctx = canvas.getContext("2d");
-        const tam = 20;
+    // Engine State
+    const state = {
+        map: [],
+        visibleMap: [], // Sistema de Fog of War (0: Oculto, 1: Já visto, 2: Visível agora)
+        player: {
+            x: 1,
+            y: 1,
+            hp: 100,
+            maxHp: 100,
+            mp: 50,
+            maxMp: 50,
+            atk: 15,
+            spellAtk: 35
+        },
+        enemies: [],
+        floor: 1
+    };
+
+    /**
+     * PROCEDURAL MAP GENERATOR (Gerador de Mapas Estruturado)
+     */
+    function generateDungeon() {
+        state.map = Array(GRID_SIZE).fill(null).map(() => Array(GRID_SIZE).fill(TILES.WALL));
+        state.visibleMap = Array(GRID_SIZE).fill(null).map(() => Array(GRID_SIZE).fill(0));
         
-        let cobra, dx, dy, comidaX, comidaY, pontuacao, jogoRodando;
-        let mudarDirecao = false; 
-        let jogoTimeout; 
-        let velocidade = 120;
-        let recorde = localStorage.getItem("snakeHighScore") || 0;
+        // Criar salas simples escavando o mapa básico
+        createRoom(1, 1, 4, 4);
+        createRoom(8, 2, 5, 4);
+        createRoom(2, 9, 5, 5);
+        createRoom(9, 9, 5, 4);
 
-        document.getElementById("recorde").innerText = `HIGH: ${recorde}`;
+        // Conectar corredores de forma limpa
+        digCorridorHorizontal(3, 1, 9);
+        digCorridorVertical(9, 3, 9);
+        digCorridorHorizontal(9, 4, 11);
+        digCorridorVertical(4, 4, 9);
 
-        function inicializar() {
-            if (jogoTimeout) clearTimeout(jogoTimeout);
+        // Posicionar Escadas de descida na última sala
+        state.map[12][11] = TILES.STAIRS;
 
-            cobra = [{x: 160, y: 160}, {x: 140, y: 160}, {x: 120, y: 160}];
-            dx = tam; 
-            dy = 0; 
-            pontuacao = 0; 
-            velocidade = 120;
-            jogoRodando = true;
-            mudarDirecao = false;
+        // Resetar posições do player e gerar inimigos
+        state.player.x = 2;
+        state.player.y = 2;
+        
+        spawnEnemies();
+        updateFogOfWar();
+    }
 
-            document.getElementById("btnReiniciar").style.display = "none";
-            document.getElementById("pontuacao").innerText = "SCORE: 0";
-            
-            gerarComida();
-            atualizarJogo();
-        }
-
-        function gerarComida() {
-            comidaX = Math.floor(Math.random() * (canvas.width / tam)) * tam;
-            comidaY = Math.floor(Math.random() * (canvas.height / tam)) * tam;
-            if (cobra.some(p => p.x === comidaX && p.y === comidaY)) gerarComida();
-        }
-
-        function atualizarJogo() {
-            if (!jogoRodando) {
-                ctx.fillStyle = "rgba(8, 11, 16, 0.85)";
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                ctx.fillStyle = "#ff3366"; 
-                ctx.font = "bold 32px system-ui, sans-serif"; 
-                ctx.textAlign = "center";
-                ctx.shadowColor = "#ff3366";
-                ctx.shadowBlur = 15;
-                ctx.fillText("FIM DE JOGO", canvas.width / 2, canvas.height / 2);
-                
-                ctx.shadowBlur = 0; 
-                document.getElementById("btnReiniciar").style.display = "inline-block";
-                return;
+    function createRoom(x, y, w, h) {
+        for (let i = x; i < x + w; i++) {
+            for (let j = y; j < y + h; j++) {
+                if (i > 0 && i < GRID_SIZE - 1 && j > 0 && j < GRID_SIZE - 1) {
+                    state.map[j][i] = TILES.FLOOR;
+                }
             }
+        }
+    }
 
-            jogoTimeout = setTimeout(() => {
-                mudarDirecao = false; 
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
+    function digCorridorHorizontal(y, x1, x2) {
+        for (let x = Math.min(x1, x2); x <= Math.max(x1, x2); x++) {
+            state.map[y][x] = TILES.FLOOR;
+        }
+    }
 
-                const cabeca = { x: cobra[0].x + dx, y: cobra[0].y + dy };
+    function digCorridorVertical(x, y1, y2) {
+        for (let y = Math.min(y1, y2); y <= Math.max(y1, y2); y++) {
+            state.map[y][x] = TILES.FLOOR;
+        }
+    }
+
+    function spawnEnemies() {
+        state.enemies = [];
+        const spawnPoints = [
+            {x: 10, y: 3, hp: 40, maxHp: 40, name: "Goblin", color: "#ef4444"},
+            {x: 4, y: 11, hp: 60, maxHp: 60, name: "Orc", color: "#b91c1c"},
+            {x: 11, y: 11, hp: 35, maxHp: 35, name: "Esqueleto Magor", color: "#fca5a5"}
+        ];
+
+        // Aumenta dificuldade dinamicamente com base no andar atual
+        spawnPoints.forEach(ep => {
+            state.enemies.push({
+                x: ep.x,
+                y: ep.y,
+                hp: ep.hp + (state.floor * 5),
+                maxHp: ep.maxHp + (state.floor * 5),
+                atk: 8 + (state.floor * 2),
+                name: `${ep.name} Nv.${state.floor}`,
+                color: ep.color
+            });
+        });
+    }
+
+    /**
+     * VISÃO E NÉVOA DE GUERRA (Fog of War Dinâmico por Raycasting Ray-to-Tile)
+     */
+    function updateFogOfWar() {
+        // Passa o estado anterior de visível (2) para explorado (1)
+        for (let y = 0; y < GRID_SIZE; y++) {
+            for (let x = 0; x < GRID_SIZE; x++) {
+                if (state.visibleMap[y][x] === 2) state.visibleMap[y][x] = 1;
+            }
+        }
+
+        // Campo de visão simples (Raio em cruz e diagonal)
+        const radius = 4;
+        for (let dY = -radius; dY <= radius; dY++) {
+            for (let dX = -radius; dX <= radius; dX++) {
+                if (dX*dX + dY*dY <= radius*radius) {
+                    const targetX = state.player.x + dX;
+                    const targetY = state.player.y + dY;
+
+                    if (targetX >= 0 && targetX < GRID_SIZE && targetY >= 0 && targetY < GRID_SIZE) {
+                        state.visibleMap[targetY][targetX] = 2; // Visível em tempo real
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * CONTROLE DO FLUXO DE TURNOS E GAMEPLAY
+     */
+    function handlePlayerMove(dx, dy) {
+        const targetX = state.player.x + dx;
+        const targetY = state.player.y + dy;
+
+        // 1. Bloqueio de colisão com parede física
+        if (state.map[targetY][targetX] === TILES.WALL) return;
+
+        // 2. Detecção e resolução de Combate Corpo a Corpo
+        const enemy = state.enemies.find(e => e.x === targetX && e.y === targetY);
+        if (enemy) {
+            executeAttack(state.player, enemy);
+            processEnemyTurn();
+            return;
+        }
+
+        // 3. Movimentação limpa
+        state.player.x = targetX;
+        state.player.y = targetY;
+
+        // 4. Interação com elementos do mapa (Escadas)
+        if (state.map[state.player.y][state.player.x] === TILES.STAIRS) {
+            state.floor++;
+            addLog(`Você desceu para o Andar ${state.floor}!`, 'system');
+            document.getElementById('floor-display').innerText = `Andar ${state.floor}`;
+            generateDungeon();
+            return;
+        }
+
+        // Regen passiva leve de Mana por andar percorrido
+        if (state.player.mp < state.player.maxMp) state.player.mp = Math.min(state.player.maxMp, state.player.mp + 1);
+
+        updateFogOfWar();
+        processEnemyTurn();
+    }
+
+    function castSpell() {
+        if (state.player.mp < 15) {
+            addLog("Mana insuficiente!", "system");
+            return;
+        }
+
+        // Alvo mais próximo visível
+        const target = state.enemies.find(e => state.visibleMap[e.y][e.x] === 2);
+        
+        if (!target) {
+            addLog("Nenhum inimigo visível para alvejar a magia.", "system");
+            return;
+        }
+
+        state.player.mp -= 15;
+        addLog(`Você lançou Explosão de Arcanismo em ${target.name}!`, 'player');
+        
+        target.hp -= state.player.spellAtk;
+        if (target.hp <= 0) {
+            addLog(`A explosão destruiu o ${target.name}!`, 'player');
+            state.enemies = state.enemies.filter(e => e !== target);
+        }
+
+        processEnemyTurn();
+    }
+
+    function executeAttack(attacker, target) {
+        const damage = Math.floor(attacker.atk * (0.8 + Math.random() * 0.4));
+        target.hp -= damage;
+        
+        if (attacker === state.player) {
+            addLog(`Você atacou ${target.name} e causou ${damage} de dano!`, 'player');
+            if (target.hp <= 0) {
+                addLog(`Você derrotou ${target.name}!`, 'player');
+                state.enemies = state.enemies.filter(e => e !== target);
+            }
+        } else {
+            addLog(`${attacker.name} atacou você e causou ${damage} de dano!`, 'enemy');
+            if (target.hp <= 0) {
+                addLog(`Você sucumbiu à masmorra. Fim de jogo!`, 'enemy');
+                alert("Game Over! O jogo será reiniciado.");
+                resetGame();
+            }
+        }
+    }
+
+    /**
+     * INTELIGÊNCIA ARTIFICIAL DOS INIMIGOS (Turno Adversário)
+     */
+    function processEnemyTurn() {
+        state.enemies.forEach(enemy => {
+            const distanceX = state.player.x - enemy.x;
+            const distanceY = state.player.y - enemy.y;
+            const distance = Math.sqrt(distanceX*distanceX + distanceY*distanceY);
+
+            // Se estiver colado no player, ataca
+            if (distance <= 1.5) {
+                executeAttack(enemy, state.player);
+            } 
+            // Se vir o player (estiver na zona visível do player), persegue
+            else if (state.visibleMap[enemy.y][enemy.x] === 2) {
+                const nextDx = Math.sign(distanceX);
+                const nextDy = Math.sign(distanceY);
+
+                // Tenta mover na direção ideal calculando o eixo mais distante primeiro
+                let stepX = enemy.x + nextDx;
+                let stepY = enemy.y + nextDy;
+
+                if (Math.abs(distanceX) >= Math.abs(distanceY) && state.map[enemy.y][stepX] !== TILES.WALL && !isEnemyAt(stepX, enemy.y)) {
+                    enemy.x = stepX;
+                } else if (state.map[stepY][enemy.x] !== TILES.WALL && !isEnemyAt(enemy.x, stepY)) {
+                    enemy.y = stepY;
+                }
+            }
+        });
+
+        updateUI();
+        render();
+    }
+
+    function isEnemyAt(x, y) {
+        return state.enemies.some(e => e.x === x && e.y === y);
+    }
+
+    /**
+     * RENDERIZAÇÃO GRÁFICA DO ENGINE (HTML5 Canvas)
+     */
+    function render() {
+        CTX.clearRect(0, 0, CANVAS.width, CANVAS.height);
+
+        for (let y = 0; y < GRID_SIZE; y++) {
+            for (let x = 0; x < GRID_SIZE; x++) {
+                const visibility = state.visibleMap[y][x];
                 
-                if (cabeca.x < 0) cabeca.x = canvas.width - tam;
-                if (cabeca.x >= canvas.width) cabeca.x = 0;
-                if (cabeca.y < 0) cabeca.y = canvas.height - tam;
-                if (cabeca.y >= canvas.height) cabeca.y = 0;
-
-                const colidiuCorpo = cobra.some(p => p.x === cabeca.x && p.y === cabeca.y);
-                if (colidiuCorpo) {
-                    jogoRodando = false;
-                    atualizarJogo();
-                    return;
+                // Se o tile nunca foi visto, desenha preto absoluto
+                if (visibility === 0) {
+                    CTX.fillStyle = '#000000';
+                    CTX.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                    continue;
                 }
 
-                cobra.unshift(cabeca);
-
-                if (cabeca.x === comidaX && cabeca.y === comidaY) {
-                    pontuacao += 10;
-                    document.getElementById("pontuacao").innerText = `SCORE: ${pontuacao}`;
-                    
-                    if (pontuacao > recorde) {
-                        recorde = pontuacao;
-                        localStorage.setItem("snakeHighScore", recorde);
-                        document.getElementById("recorde").innerText = `HIGH: ${recorde}`;
-                    }
-
-                    if (velocidade > 50) velocidade -= 3;
-                    gerarComida();
+                // Render Base do terreno
+                if (state.map[y][x] === TILES.WALL) {
+                    CTX.fillStyle = visibility === 2 ? '#3b3b4f' : '#22222f';
+                } else if (state.map[y][x] === TILES.STAIRS) {
+                    CTX.fillStyle = '#10b981';
                 } else {
-                    cobra.pop();
+                    CTX.fillStyle = visibility === 2 ? '#242430' : '#14141c';
                 }
-
-                ctx.fillStyle = "#ff3366";
-                ctx.shadowColor = "#ff3366";
-                ctx.shadowBlur = 10;
-                ctx.fillRect(comidaX + 3, comidaY + 3, tam - 6, tam - 6);
-
-                cobra.forEach((p, index) => {
-                    if (index === 0) {
-                        ctx.fillStyle = "#00e5ff"; 
-                        ctx.shadowColor = "#00e5ff";
-                    } else {
-                        ctx.fillStyle = "#00ff88"; 
-                        ctx.shadowColor = "#00ff88";
-                    }
-                    ctx.shadowBlur = 6;
-                    ctx.fillRect(p.x + 1, p.y + 1, tam - 2, tam - 2);
-                });
                 
-                ctx.shadowBlur = 0; 
-                atualizarJogo();
-            }, velocidade);
+                CTX.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                
+                // Bordas leves para grid táctico estruturado
+                CTX.strokeStyle = 'rgba(255, 255, 255, 0.02)';
+                CTX.strokeRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+            }
         }
 
-        function mudarDirecaoPara(novaTecla) {
-            if (mudarDirecao) return;
+        // Renderizar Inimigos Visíveis
+        state.enemies.forEach(enemy => {
+            if (state.visibleMap[enemy.y][enemy.x] === 2) {
+                // Desenha corpo
+                CTX.fillStyle = enemy.color;
+                CTX.beginPath();
+                CTX.arc(enemy.x * TILE_SIZE + TILE_SIZE/2, enemy.y * TILE_SIZE + TILE_SIZE/2, TILE_SIZE/2.5, 0, Math.PI * 2);
+                CTX.fill();
 
-            if (novaTecla === "ArrowUp" && dy === 0) { dx = 0; dy = -tam; mudarDirecao = true; }
-            if (novaTecla === "ArrowDown" && dy === 0) { dx = 0; dy = tam; mudarDirecao = true; }
-            if (novaTecla === "ArrowLeft" && dx === 0) { dx = -tam; dy = 0; mudarDirecao = true; }
-            if (novaTecla === "ArrowRight" && dx === 0) { dx = tam; dy = 0; mudarDirecao = true; }
+                // Barra de vida interna flutuante do monstro
+                const hpPercent = enemy.hp / enemy.maxHp;
+                CTX.fillStyle = 'rgba(0,0,0,0.6)';
+                CTX.fillRect(enemy.x * TILE_SIZE + 4, enemy.y * TILE_SIZE + 4, TILE_SIZE - 8, 4);
+                CTX.fillStyle = '#ef4444';
+                CTX.fillRect(enemy.x * TILE_SIZE + 4, enemy.y * TILE_SIZE + 4, (TILE_SIZE - 8) * hpPercent, 4);
+            }
+        });
+
+        // Renderizar Jogador
+        CTX.fillStyle = '#a855f7'; // Roxo Vibrante
+        CTX.beginPath();
+        CTX.arc(state.player.x * TILE_SIZE + TILE_SIZE/2, state.player.y * TILE_SIZE + TILE_SIZE/2, TILE_SIZE/2.2, 0, Math.PI * 2);
+        CTX.fill();
+        
+        // Brilho central no Player
+        CTX.fillStyle = '#ffffff';
+        CTX.beginPath();
+        CTX.arc(state.player.x * TILE_SIZE + TILE_SIZE/2 - 3, state.player.y * TILE_SIZE + TILE_SIZE/2 - 3, 3, 0, Math.PI * 2);
+        CTX.fill();
+    }
+
+    /**
+     * SISTEMA DE INTERFACE (UI & OUTPUTS)
+     */
+    function updateUI() {
+        const hpPercent = (state.player.hp / state.player.maxHp) * 100;
+        const mpPercent = (state.player.mp / state.player.maxMp) * 100;
+
+        document.getElementById('hp-fill').style.width = `${hpPercent}%`;
+        document.getElementById('hp-text').innerText = `${state.player.hp} / ${state.player.maxHp}`;
+
+        document.getElementById('mp-fill').style.width = `${mpPercent}%`;
+        document.getElementById('mp-text').innerText = `${state.player.mp} / ${state.player.maxMp}`;
+    }
+
+    function addLog(text, type) {
+        const container = document.getElementById('log-container');
+        const entry = document.createElement('div');
+        entry.className = `log-entry log-${type}`;
+        entry.innerText = `> ${text}`;
+        container.appendChild(entry);
+        container.scrollTop = container.scrollHeight;
+    }
+
+    function resetGame() {
+        state.player.hp = state.player.maxHp;
+        state.player.mp = state.player.maxMp;
+        state.floor = 1;
+        document.getElementById('log-container').innerHTML = '';
+        document.getElementById('floor-display').innerText = `Andar 1`;
+        addLog("Você entrou nas profundezas escuras...", "system");
+        generateDungeon();
+        updateUI();
+        render();
+    }
+
+    /**
+     * INTERCEPTAÇÃO DE TECLADO / CONTROLES
+     */
+    window.addEventListener('keydown', e => {
+        switch(e.key.toLowerCase()) {
+            case 'arrowup':
+            case 'w':
+                handlePlayerMove(0, -1);
+                break;
+            case 'arrowdown':
+            case 's':
+                handlePlayerMove(0, 1);
+                break;
+            case 'arrowleft':
+            case 'a':
+                handlePlayerMove(-1, 0);
+                break;
+            case 'arrowright':
+            case 'd':
+                handlePlayerMove(1, 0);
+                break;
+            case ' ':
+                // Passa o turno guardando posição e agindo inimigos
+                addLog("Você aguardou um momento.", "system");
+                processEnemyTurn();
+                break;
+            case 'f':
+                castSpell();
+                break;
         }
+    });
 
-        window.addEventListener("keydown", e => mudarDirecaoPara(e.key));
+    // Inicialização da aplicação
+    resetGame();
+</script>
 
-        document.getElementById("btnUp").addEventListener("click", () => mudarDirecaoPara("ArrowUp"));
-        document.getElementById("btnDown").addEventListener("click", () => mudarDirecaoPara("ArrowDown"));
-        document.getElementById("btnLeft").addEventListener("click", () => mudarDirecaoPara("ArrowLeft"));
-        document.getElementById("btnRight").addEventListener("click", () => mudarDirecaoPara("ArrowRight"));
-
-        inicializar();
-    </script>
 </body>
 </html>
