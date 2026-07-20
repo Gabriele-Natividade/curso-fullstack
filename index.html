@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shadow Dungeon - RPG Tático</title>
+    <title>Shadow Dungeon - RPG Tático (Floresta Noturna)</title>
     <style>
         :root {
-            --bg-color: #0d0d13;
-            --panel-color: #1a1a24;
-            --border-color: #3a3a50;
-            --text-color: #e2e8f0;
-            --accent-color: #9333ea;
-            --hp-color: #ef4444;
-            --mp-color: #3b82f6;
+            --bg-color: #040807; /* Preto esverdeado muito escuro */
+            --panel-color: #0b1a16; /* Verde escuro profundo */
+            --border-color: #204d41; /* Verde médio azulado */
+            --text-color: #e6f7f2; /* Menta muito claro */
+            --accent-color: #2dd4bf; /* Teal/Ciano brilhante */
+            --hp-color: #ff4d4d; /* Vermelho vibrante (mantido para contraste) */
+            --mp-color: #f59e0b; /* Âmbar/Laranja */
         }
 
         * {
@@ -40,7 +40,7 @@
             padding: 20px;
             border-radius: 12px;
             border: 2px solid var(--border-color);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.7);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.7), 0 0 15px rgba(45, 212, 191, 0.1);
         }
 
         #canvas-wrapper {
@@ -48,7 +48,7 @@
         }
 
         canvas {
-            background-color: #050507;
+            background-color: #020404;
             border-radius: 6px;
             border: 1px solid var(--border-color);
             display: block;
@@ -61,10 +61,10 @@
         }
 
         .panel-section {
-            background-color: rgba(0, 0, 0, 0.3);
+            background-color: rgba(0, 0, 0, 0.4);
             padding: 15px;
             border-radius: 6px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(45, 212, 191, 0.1);
             margin-bottom: 15px;
         }
 
@@ -74,20 +74,23 @@
             margin-bottom: 10px;
             text-transform: uppercase;
             letter-spacing: 1px;
+            text-shadow: 0 0 5px rgba(45, 212, 191, 0.5);
         }
 
         .stat-bar {
-            background-color: #2d3748;
+            background-color: #1a2e29;
             height: 20px;
             border-radius: 10px;
             overflow: hidden;
             margin-top: 5px;
             position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .stat-fill {
             height: 100%;
             transition: width 0.2s ease-out;
+            box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.5);
         }
 
         #hp-fill { background-color: var(--hp-color); }
@@ -115,6 +118,7 @@
             flex-direction: column;
             gap: 4px;
             padding-right: 5px;
+            color: #a3b3ae;
         }
 
         #log-container::-webkit-scrollbar {
@@ -125,23 +129,26 @@
             border-radius: 2px;
         }
 
-        .log-entry { padding: 2px 4px; border-radius: 3px; }
-        .log-player { color: #4ade80; }
-        .log-enemy { color: #f87171; }
-        .log-system { color: #fbbf24; }
+        .log-entry { padding: 2px 4px; border-radius: 3px; background-color: rgba(0, 0, 0, 0.2); }
+        .log-player { color: var(--accent-color); }
+        .log-enemy { color: var(--hp-color); }
+        .log-system { color: #facc15; } /* Amarelo limão */
 
         .controls-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 8px;
             font-size: 0.8rem;
+            color: #8da39e;
         }
 
         kbd {
-            background: #2d3748;
+            background: #1a2e29;
+            color: var(--text-color);
             padding: 2px 6px;
             border-radius: 4px;
-            border: 1px solid #4a5568;
+            border: 1px solid var(--border-color);
+            font-weight: bold;
         }
     </style>
 </head>
@@ -171,12 +178,12 @@
                     </div>
                 </div>
                 <div style="margin-top: 12px; font-size: 0.9rem;">
-                    Status: <strong id="floor-display" style="color: var(--accent-color)">Andar 1</strong>
+                    Status: <strong id="floor-display" style="color: var(--mp-color)">Andar 1</strong>
                 </div>
             </div>
 
             <div class="panel-section">
-                <h2>Histórico de Ações</h2>
+                <h2>Histórico</h2>
                 <div id="log-container"></div>
             </div>
         </div>
@@ -184,11 +191,11 @@
         <div class="panel-section" style="margin-bottom: 0;">
             <h2>Comandos</h2>
             <div class="controls-grid">
-                <div><kbd>Seta ↑</kbd> / <kbd>W</kbd> Mover Norte</div>
-                <div><kbd>Seta ↓</kbd> / <kbd>S</kbd> Mover Sul</div>
-                <div><kbd>Seta ←</kbd> / <kbd>A</kbd> Mover Oeste</div>
-                <div><kbd>Seta →</kbd> / <kbd>D</kbd> Mover Leste</div>
-                <div><kbd>Espaço</kbd> Passar Turno</div>
+                <div><kbd>↑</kbd> / <kbd>W</kbd> Norte</div>
+                <div><kbd>↓</kbd> / <kbd>S</kbd> Sul</div>
+                <div><kbd>←</kbd> / <kbd>A</kbd> Oeste</div>
+                <div><kbd>→</kbd> / <kbd>D</kbd> Leste</div>
+                <div><kbd>Espaço</kbd> Esperar</div>
                 <div><kbd>F</kbd> Magia (15 MP)</div>
             </div>
         </div>
@@ -200,6 +207,20 @@
     const CTX = CANVAS.getContext('2d');
     const TILE_SIZE = 40; 
     const GRID_SIZE = 15;
+
+    // Cores do Canvas baseadas no tema
+    const COLOR_THEME = {
+        black: '#000000',
+        wall_vis: '#1a3d34', // Verde floresta escuro
+        wall_hid: '#0d1f1a', // Verde floresta muito escuro
+        floor_vis: '#0d1f1a', // Fundo escuro
+        floor_hid: '#050a09', // Quase preto
+        stairs: '#f59e0b',    // Âmbar (MP color)
+        player: '#2dd4bf',    // Teal (Accent color)
+        player_eye: '#ffffff',
+        enemy_hp_bg: 'rgba(0,0,0,0.7)',
+        enemy_hp_fill: '#ff4d4d'
+    };
 
     const TILES = {
         WALL: 0,
@@ -273,9 +294,9 @@
     function spawnEnemies() {
         state.enemies = [];
         const spawnPoints = [
-            {x: 10, y: 3, hp: 40, maxHp: 40, name: "Goblin", color: "#ef4444"},
-            {x: 4, y: 11, hp: 60, maxHp: 60, name: "Orc", color: "#b91c1c"},
-            {x: 11, y: 11, hp: 35, maxHp: 35, name: "Esqueleto Mago", color: "#fca5a5"}
+            {x: 10, y: 3, hp: 40, maxHp: 40, name: "Cobra", color: "#4ade80"}, // Verde claro
+            {x: 4, y: 11, hp: 60, maxHp: 60, name: "Aranha", color: "#a78bfa"}, // Roxo claro
+            {x: 11, y: 11, hp: 35, maxHp: 35, name: "Sombra", color: "#94a3b8"} // Cinza azulado
         ];
 
         spawnPoints.forEach(ep => {
@@ -363,11 +384,11 @@
         }
 
         state.player.mp -= 15;
-        addLog(`Você lançou Explosão de Arcanismo em ${target.name}!`, 'player');
+        addLog(`Você lançou Raio Solar em ${target.name}!`, 'player');
         
         target.hp -= state.player.spellAtk;
         if (target.hp <= 0) {
-            addLog(`A explosão destruiu o ${target.name}!`, 'player');
+            addLog(`O raio obliterou o ${target.name}!`, 'player');
             state.enemies = state.enemies.filter(e => e !== target);
         }
 
@@ -391,7 +412,7 @@
             if (target.hp <= 0) {
                 target.hp = 0;
                 state.isGameOver = true;
-                addLog(`Você sucumbiu à masmorra. Fim de jogo!`, 'enemy');
+                addLog(`Você sucumbiu à floresta. Fim de jogo!`, 'enemy');
                 updateUI();
                 render();
                 setTimeout(() => {
@@ -411,7 +432,7 @@
             const enemy = state.enemies[i];
             const distanceX = state.player.x - enemy.x;
             const distanceY = state.player.y - enemy.y;
-            const distance = Math.abs(distanceX) + Math.abs(distanceY); // Distância Manhattan para grid tático
+            const distance = Math.abs(distanceX) + Math.abs(distanceY); 
 
             if (distance <= 1) {
                 executeAttack(enemy, state.player);
@@ -420,7 +441,6 @@
                 let nextDx = Math.sign(distanceX);
                 let nextDy = Math.sign(distanceY);
 
-                // IA tática simplificada para evitar andar na diagonal ou atravessar paredes
                 if (Math.abs(distanceX) >= Math.abs(distanceY)) {
                     if (state.map[enemy.y][enemy.x + nextDx] !== TILES.WALL && !isEnemyAt(enemy.x + nextDx, enemy.y)) {
                         enemy.x += nextDx;
@@ -453,22 +473,22 @@
                 const visibility = state.visibleMap[y][x];
                 
                 if (visibility === 0) {
-                    CTX.fillStyle = '#000000';
+                    CTX.fillStyle = COLOR_THEME.black;
                     CTX.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
                     continue;
                 }
 
                 if (state.map[y][x] === TILES.WALL) {
-                    CTX.fillStyle = visibility === 2 ? '#3b3b4f' : '#22222f';
+                    CTX.fillStyle = visibility === 2 ? COLOR_THEME.wall_vis : COLOR_THEME.wall_hid;
                 } else if (state.map[y][x] === TILES.STAIRS) {
-                    CTX.fillStyle = '#10b981';
+                    CTX.fillStyle = COLOR_THEME.stairs;
                 } else {
-                    CTX.fillStyle = visibility === 2 ? '#242430' : '#14141c';
+                    CTX.fillStyle = visibility === 2 ? COLOR_THEME.floor_vis : COLOR_THEME.floor_hid;
                 }
                 
                 CTX.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
                 
-                CTX.strokeStyle = 'rgba(255, 255, 255, 0.02)';
+                CTX.strokeStyle = 'rgba(45, 212, 191, 0.03)'; // Sutil grade teal
                 CTX.strokeRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
             }
         }
@@ -481,20 +501,21 @@
                 CTX.fill();
 
                 const hpPercent = Math.max(0, enemy.hp / enemy.maxHp);
-                CTX.fillStyle = 'rgba(0,0,0,0.6)';
+                CTX.fillStyle = COLOR_THEME.enemy_hp_bg;
                 CTX.fillRect(enemy.x * TILE_SIZE + 4, enemy.y * TILE_SIZE + 4, TILE_SIZE - 8, 4);
-                CTX.fillStyle = '#ef4444';
+                CTX.fillStyle = COLOR_THEME.enemy_hp_fill;
                 CTX.fillRect(enemy.x * TILE_SIZE + 4, enemy.y * TILE_SIZE + 4, (TILE_SIZE - 8) * hpPercent, 4);
             }
         });
 
         if (!state.isGameOver) {
-            CTX.fillStyle = '#a855f7'; 
+            CTX.fillStyle = COLOR_THEME.player; 
             CTX.beginPath();
             CTX.arc(state.player.x * TILE_SIZE + TILE_SIZE/2, state.player.y * TILE_SIZE + TILE_SIZE/2, TILE_SIZE/2.2, 0, Math.PI * 2);
             CTX.fill();
             
-            CTX.fillStyle = '#ffffff';
+            // "Olho" do jogador para direção (simples)
+            CTX.fillStyle = COLOR_THEME.player_eye;
             CTX.beginPath();
             CTX.arc(state.player.x * TILE_SIZE + TILE_SIZE/2 - 3, state.player.y * TILE_SIZE + TILE_SIZE/2 - 3, 3, 0, Math.PI * 2);
             CTX.fill();
@@ -528,7 +549,7 @@
         state.isGameOver = false;
         document.getElementById('log-container').innerHTML = '';
         document.getElementById('floor-display').innerText = `Andar 1`;
-        addLog("Você entrou nas profundezas escuras...", "system");
+        addLog("Você entrou na floresta sussurrante...", "system");
         generateDungeon();
         updateUI();
         render();
@@ -555,7 +576,7 @@
                 handlePlayerMove(1, 0);
                 break;
             case ' ':
-                e.preventDefault(); // Evita scroll da página com o espaço
+                e.preventDefault(); 
                 addLog("Você aguardou um momento.", "system");
                 processEnemyTurn();
                 break;
