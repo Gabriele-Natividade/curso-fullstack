@@ -132,7 +132,7 @@
         .log-entry { padding: 2px 4px; border-radius: 3px; background-color: rgba(0, 0, 0, 0.2); }
         .log-player { color: var(--accent-color); }
         .log-enemy { color: var(--hp-color); }
-        .log-system { color: #facc15; } /* Amarelo limão */
+        .log-system { color: #facc15; }
 
         .controls-grid {
             display: grid;
@@ -208,15 +208,14 @@
     const TILE_SIZE = 40; 
     const GRID_SIZE = 15;
 
-    // Cores do Canvas baseadas no tema
     const COLOR_THEME = {
         black: '#000000',
-        wall_vis: '#1a3d34', // Verde floresta escuro
-        wall_hid: '#0d1f1a', // Verde floresta muito escuro
-        floor_vis: '#0d1f1a', // Fundo escuro
-        floor_hid: '#050a09', // Quase preto
-        stairs: '#f59e0b',    // Âmbar (MP color)
-        player: '#2dd4bf',    // Teal (Accent color)
+        wall_vis: '#1a3d34',
+        wall_hid: '#0d1f1a',
+        floor_vis: '#0d1f1a',
+        floor_hid: '#050a09',
+        stairs: '#f59e0b',
+        player: '#2dd4bf',
         player_eye: '#ffffff',
         enemy_hp_bg: 'rgba(0,0,0,0.7)',
         enemy_hp_fill: '#ff4d4d'
@@ -294,9 +293,9 @@
     function spawnEnemies() {
         state.enemies = [];
         const spawnPoints = [
-            {x: 10, y: 3, hp: 40, maxHp: 40, name: "Cobra", color: "#4ade80"}, // Verde claro
-            {x: 4, y: 11, hp: 60, maxHp: 60, name: "Aranha", color: "#a78bfa"}, // Roxo claro
-            {x: 11, y: 11, hp: 35, maxHp: 35, name: "Sombra", color: "#94a3b8"} // Cinza azulado
+            {x: 10, y: 3, hp: 40, maxHp: 40, name: "Cobra", color: "#4ade80"},
+            {x: 4, y: 11, hp: 60, maxHp: 60, name: "Aranha", color: "#a78bfa"},
+            {x: 11, y: 11, hp: 35, maxHp: 35, name: "Sombra", color: "#94a3b8"}
         ];
 
         spawnPoints.forEach(ep => {
@@ -488,7 +487,7 @@
                 
                 CTX.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
                 
-                CTX.strokeStyle = 'rgba(45, 212, 191, 0.03)'; // Sutil grade teal
+                CTX.strokeStyle = 'rgba(45, 212, 191, 0.03)';
                 CTX.strokeRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
             }
         }
@@ -514,7 +513,6 @@
             CTX.arc(state.player.x * TILE_SIZE + TILE_SIZE/2, state.player.y * TILE_SIZE + TILE_SIZE/2, TILE_SIZE/2.2, 0, Math.PI * 2);
             CTX.fill();
             
-            // "Olho" do jogador para direção (simples)
             CTX.fillStyle = COLOR_THEME.player_eye;
             CTX.beginPath();
             CTX.arc(state.player.x * TILE_SIZE + TILE_SIZE/2 - 3, state.player.y * TILE_SIZE + TILE_SIZE/2 - 3, 3, 0, Math.PI * 2);
