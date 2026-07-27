@@ -11,7 +11,7 @@
             --border-color: #204d41; 
             --text-color: #e6f7f2; 
             --accent-color: #2dd4bf; 
-            
+
             --hp-color: #ff4d4d; 
             --mp-color: #f59e0b;
         }
@@ -460,6 +460,7 @@
         updateUI();
         render();
     }
+
 
     function isEnemyAt(x, y) {
         return state.enemies.some(e => e.x === x && e.y === y);
