@@ -5,10 +5,16 @@ function App() {
   const [email, setEmail] = useState("");
   const [idade, setIdade] = useState("");
 
+  const [user, setUser] = useState({});
+
   function handRegister(e) {
     e.preventDefault();
 
-    alert("TESTE");
+    setUser({
+      nome: nome,
+      email: email,
+      idade: idade,
+    });
   }
 
   return (
@@ -52,11 +58,11 @@ function App() {
       <br />
 
       <div>
-        <span>Bem vindo: {nome}</span>
+        <span>Bem vindo: {user.nome}</span>
         <br />
-        <span> Idade: 25 anos</span>
+        <span> Idade: {user.idade} anos</span>
         <br />
-        <span> Email: gabriele@example.com</span>
+        <span> Email: {user.email}</span>
         <br />
       </div>
     </div>
