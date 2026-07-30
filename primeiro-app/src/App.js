@@ -1,11 +1,22 @@
 
-
-function App() {
+function App(){
   return (
-    <div className="App">
-      <h1>Bem-Vindo ao meu Projeto</h1>  
-    </div>
+    <div>
+      <h1>Componente App</h1>
+      <Nome/>
+      <br/> 
+      <Nome/>
+    </div>  
   );
 }
 
+
+
 export default App;
+
+function Nome(){
+  return (
+    <span>Bem-vindo:Gabriele Natividade</span>
+  )
+}
+
