@@ -3,9 +3,11 @@ import { useState } from "react";
 function App() {
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
-  const [idade, setIdade] = useState(0);
+  const [idade, setIdade] = useState("");
 
   function handRegister(e) {
+    e.preventDefault();
+
     alert("TESTE");
   }
 
