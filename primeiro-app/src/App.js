@@ -1,11 +1,12 @@
+import Nome from "./components/Nome";
 
 function App(){
   return (
     <div>
       <h1>Componente App</h1>
-      <Nome/>
+      <Nome aluno="João" idade={20}/>
       <br/> 
-      <Nome/>
+      <Nome aluno="Maria" idade={25}/>
     </div>  
   );
 }
@@ -14,9 +15,5 @@ function App(){
 
 export default App;
 
-function Nome(){
-  return (
-    <span>Bem-vindo:Gabriele Natividade</span>
-  )
-}
+
 
