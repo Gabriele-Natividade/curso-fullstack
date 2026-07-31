@@ -54,7 +54,6 @@ function App() {
       </form>
       <br />
       <br />
-      //continuando o código, vamos exibir os dados do usuário registrado
       <div>
         <span>Bem vindo: {user.nome}</span>
         <br />
