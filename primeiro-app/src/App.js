@@ -20,7 +20,6 @@ function App() {
   return (
     <div>
       <h1>Cadastrando usuario</h1>
-
       <form
         onSubmit={(e) => {
           handRegister(e);
@@ -53,10 +52,9 @@ function App() {
         <br />
         <button type="submit">Registrar</button>
       </form>
-
       <br />
       <br />
-
+      //continuando o código, vamos exibir os dados do usuário registrado
       <div>
         <span>Bem vindo: {user.nome}</span>
         <br />
