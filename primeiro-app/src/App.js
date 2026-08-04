@@ -9,6 +9,7 @@ function App() {
 
   useEffect(() => {
     const tarefasStorage = localStorage.getItem("@tarefas");
+    console.log(tarefasStorage);
     if (tarefasStorage) {
       setTarefas(JSON.parse(tarefasStorage));
     }
