@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function App() {
   const [input, setInput] = useState("");
@@ -6,6 +6,9 @@ function App() {
     "Pagar a conta de luz",
     "Estudar React",
   ]);
+
+  useEffect(() => {}, [tarefas]);
+
   function handRegister(e) {
     e.preventDefault();
 
