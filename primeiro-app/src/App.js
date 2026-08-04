@@ -6,14 +6,12 @@ function App() {
     "Pagar a conta de luz",
     "Estudar React",
   ]);
-
   function handRegister(e) {
     e.preventDefault();
+
+    setTarefas([...tarefas, input]);
+    setInput("");
   }
-
-  setTarefas([...tarefas, input]);
-  setInput("");
-
   return (
     <div>
       <h1>Cadastrando usuario</h1>
