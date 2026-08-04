@@ -11,6 +11,9 @@ function App() {
     e.preventDefault();
   }
 
+  setTarefas([...tarefas, input]);
+  setInput("");
+
   return (
     <div>
       <h1>Cadastrando usuario</h1>
