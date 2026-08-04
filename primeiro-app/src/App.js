@@ -7,7 +7,9 @@ function App() {
     "Estudar React",
   ]);
 
-  useEffect(() => {}, [tarefas]);
+  useEffect(() => {
+    localStorage.setItem("@tarefas", JSON.stringify(tarefas));
+  }, [tarefas]);
 
   function handRegister(e) {
     e.preventDefault();
