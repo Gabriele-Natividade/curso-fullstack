@@ -5,6 +5,7 @@ function App() {
   const [tarefas, setTarefas] = useState([
     "Pagar a conta de luz",
     "Estudar React",
+    correr,
   ]);
 
   useEffect(() => {
